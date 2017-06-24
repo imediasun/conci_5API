@@ -471,8 +471,10 @@ class MY_Controller extends CI_Controller {
             $msg = array();
             $msg ['message'] = $this->format_string($message);
             $msg ['action'] = $action;
-			
-			$msg['data']=json_encode($urlval[4]);
+			if(isset($urlval[4])){
+                $msg['data']=json_encode($urlval[4]);
+            }
+
 			
             $i = 1;
 			if($msg['action']!="driver_loc"){
@@ -525,7 +527,7 @@ class MY_Controller extends CI_Controller {
 								if($ids->messaging_status == 'available' && ($type == 'IOS' || $type == 'ANDROID')){
 									$idss = array_search($token, $regIds);
 									if($idss !== false) {
-										unset($regIds[$idss]);
+										/*unset($regIds[$idss]);*/
 									}
 									$username = (string) $ids->_id;
 									if ($username != '') {
@@ -540,7 +542,7 @@ class MY_Controller extends CI_Controller {
 								}else if($ids->messaging_status == 'available'){
 									$idss = array_search($token, $regIds);
 									if($idss !== false) {
-										unset($regIds[$idss]);
+										/*unset($regIds[$idss]);*/
 									}
 									$username = (string) $ids->_id;
 									if ($username != '') {
@@ -556,7 +558,7 @@ class MY_Controller extends CI_Controller {
 							}else{
 								$idss = array_search($token, $regIds);
 								if($idss !== false) {
-									unset($regIds[$idss]);
+									/*unset($regIds[$idss]);*/
 								}
 								$username = (string) $ids->_id;
 								if ($username != '') {
@@ -578,7 +580,8 @@ class MY_Controller extends CI_Controller {
 				$this->sendPushNotificationToGCMOrg($regIds, $msg, $app);
 			}
 			if (!empty($regIds) && $type == 'IOS') {
-				$this->push_notification($regIds, $msg, $app);
+
+                $this->push_notification($regIds, $msg, $app);
 			}
         }
     }
@@ -638,6 +641,7 @@ class MY_Controller extends CI_Controller {
      * */
     public function push_notification($deviceId, $message, $app) {
         $this->load->library('apns');
+
         if (is_array($deviceId) && !empty($deviceId)) {
             $this->apns->send_push_message($deviceId, $message, $app);
         } else {

@@ -14,6 +14,7 @@ class Drivers extends MY_Controller {
         $this->load->library(array('encrypt', 'form_validation'));
         $this->load->model(array('driver_model'));
         $this->load->model(array('app_model'));
+		$this->load->model(array('review_model'));
 		
 		/* Authentication Begin */
         $headers = $this->input->request_headers();
@@ -3091,6 +3092,242 @@ class Drivers extends MY_Controller {
         
 		}   
 	}
+
+
+    public function provider_last_job()
+    {
+        $returnArr['status'] = '0';
+        $returnArr['response'] = '';
+
+        $driver_id = $this->input->post('driver_id');
+        $checkDriver = $this->app_model->get_selected_fields(DRIVERS, array('_id' => new \MongoId($driver_id)));
+        if ($checkDriver->num_rows() > 0) {
+            $checkRide = $this->app_model->get_selected_fields(RIDES, array('driver.id' => $driver_id));
+            if ($checkRide->num_rows() > 0) {
+                try {
+                    $ConnMongo = new MongoClient();
+                    $db = $ConnMongo->selectDB('mongoappconciinfo1');
+                    $collection = new MongoCollection($db, 'dectar_rides');
+                } catch (MongoConnectionException $e) {
+                    exit('START THE MONGO SERVER PLZ ...!!!');
+                }
+                $data = $collection->find(array('driver.id' => $driver_id));
+                foreach ($data as $id) {
+                    $dates[] = $id['history']['end_ride']->sec;
+                }
+                $maxdate = max($dates);
+                /*echo $maxdate;*/
+                foreach ($data as $id) {
+                    if ($id['history']['end_ride']->sec == $maxdate) {
+                        $provider_job = $id;
+                    }
+                }
+
+                //Get user information
+                $checkUser = $this->app_model->get_selected_fields(USERS, array('_id' => new \MongoId($provider_job['user']['id'])), array('image', 'user_name'));
+                if (isset($checkUser->row()->image)) {
+                    if ($checkUser->row()->image != '') {
+                        $userArr['user_image'] = USER_PROFILE_IMAGE . $checkUser->row()->image;
+                    }
+                }
+                $userArr['name'] = $checkUser->row()->user_name;
+                //Get payment method
+                $checkPayment = $this->app_model->get_selected_fields(PAYMENTS, array('ride_id' => $provider_job['ride_id']), array('transactions'));
+                $transactionsArr = $checkPayment->row()->transactions;
+                $returnArr['status'] = '1';
+                $returnArr['response'] = array('transaction_information' => $transactionsArr, 'user_information' => $userArr, 'provider__last_job' => $provider_job, 'message' => $this->format_string('You can see the latest job of your provider', 'success latest provider job'));
+            } else {
+                $returnArr['response'] = $this->format_string('Records not available', 'no_records_found');
+            }
+        } else {
+            $returnArr['response'] = $this->format_string('Invalid driver !', 'error_message_ride_invalid_driver');
+        }
+
+        $json_encode = json_encode($returnArr, JSON_PRETTY_PRINT);
+        echo $this->cleanString($json_encode);
+    }
+
+    public function provider_last_job_summery()
+    {
+        $returnArr['status'] = '0';
+        $returnArr['response'] = '';
+
+        $driver_id = $this->input->post('driver_id');
+        $checkDriver = $this->app_model->get_selected_fields(DRIVERS, array('_id' => new \MongoId($driver_id)));
+        if ($checkDriver->num_rows() > 0) {
+            $checkRide = $this->app_model->get_selected_fields(RIDES, array('driver.id' => $driver_id));
+            if ($checkRide->num_rows() > 0) {
+                try {
+                    $ConnMongo = new MongoClient();
+                    $db = $ConnMongo->selectDB('mongoappconciinfo1');
+                    $collection = new MongoCollection($db, 'dectar_rides');
+                } catch (MongoConnectionException $e) {
+                    exit('START THE MONGO SERVER PLZ ...!!!');
+                }
+
+                $data = $collection->find(array('driver.id' => $driver_id));
+                $i = 0;
+                foreach ($data as $val) {
+                    $begin_timestamp = $val['history']['begin_ride']->sec;
+                    $begin_time = date('m/d/Y H:i:s', $begin_timestamp);
+                    $end_timestamp = $val['history']['end_ride']->sec;
+                    $end_time = date('m/d/Y H:i:s', $end_timestamp);
+                    $finalArr[$i]['ride_total_time_min'] = (strtotime($end_time) - strtotime($begin_time)) / 60;
+                    $finalArr[$i]['ride_id'] = $val['ride_id'];
+                    $finalArr[$i]['ride_status'] = $val['ride_status'];
+                    //Get user information
+                    $checkUser = $this->app_model->get_selected_fields(USERS, array('_id' => new \MongoId($val['user']['id'])), array('image', 'user_name'));
+                    if (isset($checkUser->row()->image)) {
+                        if ($checkUser->row()->image != '') {
+                            $finalArr[$i]['user']['image'] = USER_PROFILE_IMAGE . $checkUser->row()->image;
+                        }
+                    }
+                    $finalArr[$i]['user']['user_name'] = $checkUser->row()->user_name;
+                    //Get payment method
+                    $checkPayment = $this->app_model->get_selected_fields(PAYMENTS, array('ride_id' => $val['ride_id']), array('transactions'));
+                    $finalArr[$i]['payment_method'] = $checkPayment->row()->transactions;
+                    $i++;
+                }
+                $returnArr['status'] = '1';
+                $returnArr['response'] = array('response' => $finalArr, 'message' => $this->format_string('You can see all jobs of your provider', 'success latest provider job'));
+            } else {
+                $returnArr['response'] = $this->format_string('Records not available', 'no_records_found');
+            }
+        } else {
+            $returnArr['response'] = $this->format_string('Invalid driver !', 'error_message_ride_invalid_driver');
+        }
+
+        $json_encode = json_encode($returnArr, JSON_PRETTY_PRINT);
+        echo $this->cleanString($json_encode);
+    }
+	
+	
+	    public function get_provider_reviews()
+    {
+        $returnArr['status'] = '0';
+        $returnArr['response'] = '';
+
+        $driver_id = $this->input->post('driver_id');
+        $checkDriver = $this->app_model->get_selected_fields(DRIVERS, array('_id' => new \MongoId($driver_id)));
+        if ($checkDriver->num_rows() > 0) {
+                $get_review_options = $this->review_model->get_all_details(REVIEW_OPTIONS,array('option_holder' => 'driver'));
+                $reviewsList = array();
+                $getCond = array('driver.id' => $driver_id,'driver_review_status' => 'Yes');
+                $get_ratings = $this->review_model->get_selected_fields(RIDES,$getCond,array('ratings.driver','driver_review_status','user','history.end_ride','history.begin_ride'));
+
+            #echo '<pre>'; print_r($get_ratings->result()); die;
+
+           if($get_ratings->num_rows() > 0){
+               $usersTotalRates = 0; $commonNumTotal = 0;
+               $tot_no_of_Rates  = 0; $totalRates = 0;
+               //calculate reviews count
+               $num_reviews=$get_ratings->num_rows();
+                    foreach($get_ratings->result() as $key=>$rating){
+                    //calculate full hours
+                    $start_job=$rating->history['begin_ride']->sec;
+                    $end_job=$rating->history['end_ride']->sec;
+                    $begin_time= date('m/d/Y H:i:s', $start_job);
+                    $end_time= date('m/d/Y H:i:s', $end_job);
+                    $ride_total_time_min[] = (strtotime ($end_time)-strtotime ($begin_time))/60;
+                    $checkUser = $this->app_model->get_selected_fields(USERS, array('_id' => new \MongoId($rating->user['id'])),array('image','user_name','avg_review'));
+                        if($checkUser->row()->image){
+							$rating->ratings['user']['image']=USER_PROFILE_IMAGE . $checkUser->row()->image;
+						}
+						else{
+						$rating->ratings['user']['image']=USER_PROFILE_IMAGE.'default.jpg';	
+						}
+                        $rating->ratings['user']['name']=$checkUser->row()->user_name;
+	    				$rating->ratings['user']['avgRating']=$checkUser->row()->avg_review;
+	                    $rating->rating['driver']['medal']='';
+						
+						//count all reviews 
+						
+                        foreach($rating->ratings['driver']['ratings'] as $rateOptions){
+                                $commonNumTotal++; $tot_no_of_Rates++;
+                                $totalRates = $totalRates + $rateOptions['rating'];
+                                $usersTotalRates = $usersTotalRates + $rateOptions['rating'];
+                        }
+                        $rat['ratings']=$rating->ratings;
+						$driver_rating[]=$rating->ratings['driver'];
+    					$reviewsList[] = $rat;
+                    }
+					/* var_dump($avg_array);die; */
+             		$users_gives_review_to_this_driver=count($reviewsList);
+					$one_star=0;
+					$two_star=0;
+					$tree_star=0;
+					$fore_star=0;
+					$five_star=0;
+					
+					foreach($driver_rating as $val){
+     				 switch (round($val['avg_rating'])){
+                        case (1): $one_star++;
+                        break;
+                        case (2): $two_star++;
+                        break;
+                        case (3): $tree_star++;
+                        break;
+                        case (4): $fore_star++;
+                        break;
+                        case (5): $five_star++;
+                        break;
+                    }
+				}
+
+                    $total_time_minutes=array_sum($ride_total_time_min);
+                    $full_hours=round($total_time_minutes/60);
+                    $points=$full_hours+$num_reviews;
+                    //calculate the medals
+                    switch ($points){
+                        case ($points<50): $medal=1;
+                        break;
+                        case ($points>=50 && $points <= 150 ): $medal=2;
+                        break;
+                        case ($points>150 && $points<250): $medal=3;
+                            break;
+                        case ($points>=250 && $points<500): $medal=4;
+                            break;
+                        case ($points>=500 ): $medal=5;
+                            break;
+
+                    }
+
+                    #echo $usersTotalRates.'---'.$commonNumTotal;
+                    $this->data=array();
+                    $commonAvgRates = $usersTotalRates/$commonNumTotal;
+                    $summaryRateArr = array('totalRates' => $usersTotalRates,'commonNumTotal' => $get_ratings->num_rows(),'commonAvgRates' => $commonAvgRates);
+                    $this->data['reviewsSummary'] = $summaryRateArr;
+                    $this->data['reviewsList'] = $reviewsList;
+                    $this->data['driverMedal'] = $medal;
+                    $this->data['total_rating']['one_star'] = $one_star;
+					$this->data['total_rating']['two_star'] = $two_star;
+					$this->data['total_rating']['tree_star'] = $tree_star;
+					$this->data['total_rating']['fore_star'] = $fore_star;
+					$this->data['total_rating']['five_star'] = $five_star;
+					$this->data['total_rating']['total_users'] = $users_gives_review_to_this_driver;
+                    #echo '<pre>'; print_r($summaryRateArr); echo '<pre>'; print_r($reviewsList); die;
+                    if ($this->lang->line('admin_driver_rating_summary') != ''){
+                        $heading = stripslashes($this->lang->line('admin_driver_rating_summary'));
+                    }else{
+                        $heading = 'Driver Ratings Summary';
+                    }
+                    $this->data['heading'] = $heading;
+
+                    $returnArr['status'] = '1';
+                    $returnArr['response'] = array('review_information' => $this->data, 'message' => $this->format_string('You can see the review information of your provider', 'success review'));
+                } else {
+                    $returnArr['response'] = $this->format_string('No ratings found for this driver','admin_review_no_rating_found_driver');
+                }
+            } else {
+                $returnArr['response'] = $this->format_string('Invalid driver !', 'error_message_ride_invalid_driver');
+            }
+
+        $json_encode = json_encode($returnArr, JSON_PRETTY_PRINT);
+        echo $this->cleanString($json_encode);
+
+
+    }
+
 	
 }
 

@@ -2325,7 +2325,7 @@ class User extends MY_Controller {
     }*/
 
     public function booking_ride() {
-    //This function is usable for android only
+    //This function is usable for android and for ios
 
         $returnArr['status'] = '0';
         $returnArr['response'] = '';
@@ -2341,7 +2341,6 @@ class User extends MY_Controller {
             $code = $this->input->post('code');
             $try = intval($this->input->post('try'));
             $ride_id = (string) $this->input->post('ride_id');
-
             $drop_loc = trim((string)$this->input->post('drop_loc'));
             $drop_lat = $this->input->post('drop_lat');
             $drop_lon = $this->input->post('drop_lon');
@@ -2349,7 +2348,6 @@ class User extends MY_Controller {
              $drop_lat = 0;
              $drop_lon = 0;
             }
-
 
             $riderlocArr = array('lat' => (string) $pickup_lat, 'lon' => (string) $pickup_lon);
 
@@ -2378,6 +2376,7 @@ class User extends MY_Controller {
 
             $acceptance = 'No';
             if ($ride_id != '') {
+                var_dump($ride_id);die;
                 //How did the system knows the ride_id while the ride not confirmed by the driver
                 $checkRide = $this->app_model->get_selected_fields(RIDES, array('ride_id' => $ride_id), array('ride_id', 'ride_status', 'booking_information', 'driver', 'coupon_used', 'coupon', 'cancelled'));
 
@@ -2408,25 +2407,18 @@ class User extends MY_Controller {
                 $gender=$checkDriver->row()->category;
 
                 //Find the card_rate from location
-
                 $checkLocation = $this->app_model->get_selected_fields(LOCATIONS, array('_id' => new \MongoId($location)), array('fare'));
                 foreach($checkLocation->row()->fare as $key=>$val){
-
                     if($key==$gender){
-
                         $locationReturn=$val['per_minute'];
                     }
-
                 }
             }
 
             if ($acceptance == 'No') {
                 if ($chkValues >= 6) {
-
                     $checkUser = $this->app_model->get_selected_fields(USERS, array('_id' => new \MongoId($user_id)), array('email', 'user_name', 'country_code', 'phone_number', 'push_type', 'image'));
-
                     if ($checkUser->num_rows() == 1) {
-
                        $this->push_data=array();
                         if (isset($checkUser->row()->image)) {
                             if ($checkUser->row()->image != '') {
@@ -2441,37 +2433,35 @@ class User extends MY_Controller {
                         $userArr['pickup_lat'] = $pickup_lat; //проверить юзера ли это координаты
                         $userArr['pickup_lon'] =$pickup_lon;
                         $this->push_data['user']=$userArr;
+                        /*$this->push_data['price_per_minute']=$locationReturn;*/
 
                         //find user rating
-
                         $get_review_options = $this->review_model->get_all_details(REVIEW_OPTIONS,array('option_holder' => 'user'));
                         $reviewsList = array();
                         $getCond = array('user.id' => $user_id);
                         $get_ratings = $this->review_model->get_selected_fields(RIDES,$getCond,array('ratings.rider'));
-
-
                         $usersTotalRates = 0; $commonNumTotal = 0;
                         $tot_no_of_Rates  = 0; $totalRates = 0;
+                        $avg=0;
+                        $avg_count=0;
                         //calculate reviews count
-
-
                         foreach($get_ratings->result() as $key=>$rating){
+
                             foreach($rating->ratings['rider']['ratings'] as $rateOptions){
                                 $commonNumTotal++; $tot_no_of_Rates++;
                                 $totalRates = $totalRates + $rateOptions['rating'];
                                 $usersTotalRates = $usersTotalRates + $rateOptions['rating'];
                             }
+                            $avg=$avg+$rating->ratings['rider']['avg_rating'];
+                            if(isset($rating->ratings['rider']['avg_rating'])){
+                            $avg_count++;
+                            }
 
                         }
-
+                        $avg=$avg/$avg_count;
                         $commonAvgRates = $usersTotalRates/$commonNumTotal;
-                        $summaryRateArr = array('totalRates' => $usersTotalRates,'commonNumTotal' => $get_ratings->num_rows(),'commonAvgRates' => $commonAvgRates);
+                        $summaryRateArr = array('totalRates' => $usersTotalRates,'commonNumTotal' => $avg_count,'commonAvgRates' => $commonAvgRates);
                         $this->push_data['usersReviewsSummary'] = $summaryRateArr;
-
-
-
-
-
 
 
 
@@ -2479,6 +2469,7 @@ class User extends MY_Controller {
                             $coordinates = array(floatval($pickup_lon), floatval($pickup_lat));
                             $location = $this->app_model->find_location(floatval($pickup_lon), floatval($pickup_lat));
                             if (!empty($location['result'])) {
+
                                 $condition = array('status' => 'Active');
                                 $categoryResult = $this->app_model->get_selected_fields(CATEGORY, array('_id' => new \MongoId($category)), array('name'));
                                 if ($categoryResult->num_rows() > 0) {
@@ -2604,7 +2595,7 @@ class User extends MY_Controller {
                                     if ($type == 0) {
                                         $message = $this->format_string("Request for pickup user","request_pickup_user");
                                         $response_time = 40;/*$this->config->item('respond_timeout')*/
-									
+
                                         $options = array($ride_id, $response_time, $pickup, $drop_loc,$this->push_data);//it works ??
                                         if (!empty($android_driver)) {
                                             foreach ($push_and_driver as $keys => $value) {

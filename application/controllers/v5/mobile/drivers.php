@@ -10,6 +10,7 @@ class Drivers extends MY_Controller {
 
     function __construct() {
         parent::__construct();
+
         $this->load->helper(array('cookie', 'date', 'form', 'email'));
         $this->load->library(array('encrypt', 'form_validation'));
         $this->load->model(array('driver_model'));
@@ -23,7 +24,7 @@ class Drivers extends MY_Controller {
 		if (array_key_exists("Authkey", $headers)) $auth_key = $headers['Authkey']; else $auth_key = "";
 		if(stripos($auth_key,APP_NAME) === false) {
 			$cf_fun= $this->router->fetch_method();
-			$apply_function = array('login_driver','update_driver_location','get_provider_reviews','provider_last_job','provider_last_job_summery');
+			$apply_function = array('login_driver','update_driver_location','get_provider_reviews','provider_last_job','provider_last_job_summery','accept_ride');
 			if(!in_array($cf_fun,$apply_function)){
 				show_404();
 			}
@@ -416,6 +417,7 @@ class Drivers extends MY_Controller {
      *
      * */
     public function accept_ride() {
+
         $returnArr['status'] = '0';
         $returnArr['response'] = '';
 		$returnArr['ride_view'] = 'stay';
@@ -432,13 +434,22 @@ class Drivers extends MY_Controller {
             }
 
             if ($chkValues >= 4) {
+
                 $checkDriver = $this->driver_model->get_selected_fields(DRIVERS, array('_id' => new \MongoId($driver_id)), array('_id', 'driver_name', 'image', 'avg_review', 'email', 'dail_code', 'mobile_number', 'vehicle_number', 'vehicle_model', 'driver_commission'));
                 if ($checkDriver->num_rows() == 1) {
+
                     $checkRide = $this->driver_model->get_selected_fields(RIDES, array('ride_id' => $ride_id), array('ride_id', 'ride_status', 'booking_information', 'user.id', 'location.id', 'coupon_used', 'coupon', 'est_pickup_date', 'commission_percent'));
+
+
                     if ($checkRide->num_rows() == 1) {
+
                         if ($checkRide->row()->ride_status == 'Booked') {
                             $userVal = $this->driver_model->get_selected_fields(USERS, array('_id' => new \MongoId($checkRide->row()->user['id'])), array('_id', 'user_name', 'email', 'image', 'avg_review', 'phone_number', 'country_code', 'push_type', 'push_notification_key'));
                             if ($userVal->num_rows() > 0) {
+
+
+
+
                                 /* Update the ride information with fare and driver details -- Start */
                                 $pickup_lon = $checkRide->row()->booking_information['pickup']['latlong']['lon'];
                                 $pickup_lat = $checkRide->row()->booking_information['pickup']['latlong']['lat'];
@@ -449,6 +460,7 @@ class Drivers extends MY_Controller {
                                 $gmap = file_get_contents($urls);
 								$map_values = json_decode($gmap);
 								$routes = $map_values->routes;
+
 								if(!empty($routes)){
 									usort($routes, create_function('$a,$b', 'return intval($a->legs[0]->distance->value) - intval($b->legs[0]->distance->value);'));								
 									
@@ -500,7 +512,9 @@ class Drivers extends MY_Controller {
 									}
 
 									$fareDetails = $this->driver_model->get_all_details(LOCATIONS, array('_id' => new \MongoId($checkRide->row()->location['id'])));
+
 									if ($fareDetails->num_rows() > 0) {
+
 										$service_id = $checkRide->row()->booking_information['service_id'];
 										if (isset($fareDetails->row()->fare[$service_id])) {
 											$peak_time = '';
@@ -698,7 +712,9 @@ class Drivers extends MY_Controller {
 
 										/* Sending notification to user regarding booking confirmation -- Start */
 										# Push notification
+
 										if (isset($userVal->row()->push_type)) {
+
 											if ($userVal->row()->push_type != '') {
 												$message = $this->format_string('Your ride request confirmed', 'ride_request_confirmed');
 												$options = $driver_profile;
@@ -3073,11 +3089,8 @@ class Drivers extends MY_Controller {
 	
 	    public function provider_last_job()
     {
-
         $returnArr['status'] = '0';
-
         $returnArr['response'] = '';
-
 
         $driver_id = $this->input->post('driver_id');
         $checkDriver = $this->app_model->get_selected_fields(DRIVERS, array('_id' => new \MongoId($driver_id)));
@@ -3086,14 +3099,13 @@ class Drivers extends MY_Controller {
             if ($checkRide->num_rows() > 0) {
 
                 try {
-
                     $ConnMongo = new MongoClient();
                     $db = $ConnMongo->selectDB('mongoappconciinfo1');
                     $collection = new MongoCollection($db, 'dectar_rides');
-
                 } catch (MongoConnectionException $e) {
                     exit('START THE MONGO SERVER PLZ ...!!!');
                 }
+
                 $data = $collection->find(array('driver.id' => $driver_id));
                 foreach ($data as $id) {
                     $dates[] = $id['history']['end_ride']->sec;
@@ -3107,20 +3119,16 @@ class Drivers extends MY_Controller {
                 }
 
                 //Get user information
-
                 $checkUser = $this->app_model->get_selected_fields(USERS, array('_id' => new \MongoId($provider_job['user']['id'])),array('image','user_name'));
-
                 if (isset($checkUser->row()->image)) {
                     if ($checkUser->row()->image != '') {
                         $userArr['user_image'] = USER_PROFILE_IMAGE . $checkUser->row()->image;
                     }
                 }
                 $userArr['name']=$checkUser->row()->user_name;
-
                 //Get payment method
                 $checkPayment = $this->app_model->get_selected_fields(PAYMENTS, array('ride_id' => $provider_job['ride_id']),array('transactions'));
                 $transactionsArr=$checkPayment->row()->transactions;
-
                 $returnArr['status'] = '1';
                 $returnArr['response'] = array('transaction_information' => $transactionsArr,'user_information' => $userArr,'provider__last_job' => $provider_job, 'message' => $this->format_string('You can see the latest job of your provider', 'success latest provider job'));
             } else {
@@ -3129,7 +3137,6 @@ class Drivers extends MY_Controller {
         } else {
             $returnArr['response'] = $this->format_string('Invalid driver !', 'error_message_ride_invalid_driver');
         }
-
         $json_encode = json_encode($returnArr, JSON_PRETTY_PRINT);
         echo $this->cleanString($json_encode);
     }
@@ -3153,16 +3160,15 @@ class Drivers extends MY_Controller {
                 }
 
                 $data = $collection->find(array('driver.id' => $driver_id));
-
                 $i=0;
                 foreach($data as $val){
-
                     $begin_timestamp=$val['history']['begin_ride']->sec;
                     $begin_time= date('m/d/Y H:i:s', $begin_timestamp);
                     $end_timestamp=$val['history']['end_ride']->sec;
                     $end_time= date('m/d/Y H:i:s', $end_timestamp);
                     $finalArr[$i]['ride_total_time_min'] = (strtotime ($end_time)-strtotime ($begin_time))/60;
                     $finalArr[$i]['ride_id'] = $val['ride_id'];
+                    $finalArr[$i]['ride_status'] = $val['ride_status'];
                     //Get user information
                     $checkUser = $this->app_model->get_selected_fields(USERS, array('_id' => new \MongoId($val['user']['id'])),array('image','user_name'));
                     if (isset($checkUser->row()->image)) {
@@ -3191,17 +3197,12 @@ class Drivers extends MY_Controller {
 	
 	    public function get_provider_reviews()
     {
-
         $returnArr['status'] = '0';
-
         $returnArr['response'] = '';
-
 
         $driver_id = $this->input->post('driver_id');
         $checkDriver = $this->app_model->get_selected_fields(DRIVERS, array('_id' => new \MongoId($driver_id)));
-
         if ($checkDriver->num_rows() > 0) {
-
                 $get_review_options = $this->review_model->get_all_details(REVIEW_OPTIONS,array('option_holder' => 'driver'));
                 $reviewsList = array();
                 $getCond = array('driver.id' => $driver_id,'driver_review_status' => 'Yes');
@@ -3209,40 +3210,27 @@ class Drivers extends MY_Controller {
 
             #echo '<pre>'; print_r($get_ratings->result()); die;
 
-
            if($get_ratings->num_rows() > 0){
-
                $usersTotalRates = 0; $commonNumTotal = 0;
                $tot_no_of_Rates  = 0; $totalRates = 0;
                //calculate reviews count
-
                $num_reviews=$get_ratings->num_rows();
                     foreach($get_ratings->result() as $key=>$rating){
                     //calculate full hours
                     $start_job=$rating->history['begin_ride']->sec;
                     $end_job=$rating->history['end_ride']->sec;
-
-
-                        $begin_time= date('m/d/Y H:i:s', $start_job);
-
-                        $end_time= date('m/d/Y H:i:s', $end_job);
-
-                        $ride_total_time_min[] = (strtotime ($end_time)-strtotime ($begin_time))/60;
-
-
-
-
-
+                    $begin_time= date('m/d/Y H:i:s', $start_job);
+                    $end_time= date('m/d/Y H:i:s', $end_job);
+                    $ride_total_time_min[] = (strtotime ($end_time)-strtotime ($begin_time))/60;
                     $checkUser = $this->app_model->get_selected_fields(USERS, array('_id' => new \MongoId($rating->user['id'])),array('image','user_name'));
-
                         if($checkUser->row()->image){
 							$rating->ratings['user']['image']=USER_PROFILE_IMAGE . $checkUser->row()->image;
 						}
 						else{
 						$rating->ratings['user']['image']=USER_PROFILE_IMAGE.'default.jpg';	
 						}
-						
-						
+
+
                         $rating->ratings['user']['name']=$checkUser->row()->user_name;
                         $rating->rating['driver']['medal']='';
 						
@@ -3252,19 +3240,13 @@ class Drivers extends MY_Controller {
                                 $commonNumTotal++; $tot_no_of_Rates++;
                                 $totalRates = $totalRates + $rateOptions['rating'];
                                 $usersTotalRates = $usersTotalRates + $rateOptions['rating'];
-
                         }
                         $rat['ratings']=$rating->ratings;
 						$driver_rating[]=$rating->ratings['driver'];
-					
-						$reviewsList[] = $rat;
-
-
-
+    					$reviewsList[] = $rat;
                     }
 					/* var_dump($avg_array);die; */
-                    
-					$users_gives_review_to_this_driver=count($reviewsList);
+             		$users_gives_review_to_this_driver=count($reviewsList);
 					$one_star=0;
 					$two_star=0;
 					$tree_star=0;
@@ -3272,24 +3254,20 @@ class Drivers extends MY_Controller {
 					$five_star=0;
 					
 					foreach($driver_rating as $val){
-										
-					 switch (round($val['avg_rating'])){
+     				 switch (round($val['avg_rating'])){
                         case (1): $one_star++;
                         break;
                         case (2): $two_star++;
                         break;
                         case (3): $tree_star++;
-                            break;
+                        break;
                         case (4): $fore_star++;
-                            break;
+                        break;
                         case (5): $five_star++;
-                            break;
+                        break;
+                    }
+				}
 
-                    } 	
-						
-					}
-					
-					
                     $total_time_minutes=array_sum($ride_total_time_min);
                     $full_hours=round($total_time_minutes/60);
                     $points=$full_hours+$num_reviews;
@@ -3310,7 +3288,6 @@ class Drivers extends MY_Controller {
 
                     #echo $usersTotalRates.'---'.$commonNumTotal;
                     $this->data=array();
-
                     $commonAvgRates = $usersTotalRates/$commonNumTotal;
                     $summaryRateArr = array('totalRates' => $usersTotalRates,'commonNumTotal' => $get_ratings->num_rows(),'commonAvgRates' => $commonAvgRates);
                     $this->data['reviewsSummary'] = $summaryRateArr;
@@ -3332,16 +3309,9 @@ class Drivers extends MY_Controller {
 
                     $returnArr['status'] = '1';
                     $returnArr['response'] = array('review_information' => $this->data, 'message' => $this->format_string('You can see the review information of your provider', 'success review'));
-
-
-
-
-
                 } else {
                     $returnArr['response'] = $this->format_string('No ratings found for this driver','admin_review_no_rating_found_driver');
-
                 }
-
             } else {
                 $returnArr['response'] = $this->format_string('Invalid driver !', 'error_message_ride_invalid_driver');
             }

@@ -1,4 +1,8 @@
-[
+[{"code":"en","name":"English","nativeName":"English"},
+  {"code":"de","name":"German","nativeName":"Deutsch"},
+  {"code":"tr","name":"Turkish","nativeName":"Türkçe"},
+  {"code":"he","name":"Hebrew (modern)","nativeName":"עברית"},
+  {"code":"es","name":"Spanish; Castilian","nativeName":"español, castellano"},
   {"code":"ab","name":"Abkhaz","nativeName":"аҧсуа"},
   {"code":"aa","name":"Afar","nativeName":"Afaraf"},
   {"code":"af","name":"Afrikaans","nativeName":"Afrikaans"},
@@ -38,7 +42,7 @@
   {"code":"da","name":"Danish","nativeName":"dansk"},
   {"code":"dv","name":"Divehi; Dhivehi; Maldivian;","nativeName":"ދިވެހި"},
   {"code":"nl","name":"Dutch","nativeName":"Nederlands, Vlaams"},
-  {"code":"en","name":"English","nativeName":"English"},
+
   {"code":"eo","name":"Esperanto","nativeName":"Esperanto"},
   {"code":"et","name":"Estonian","nativeName":"eesti, eesti keel"},
   {"code":"ee","name":"Ewe","nativeName":"Eʋegbe"},
@@ -49,13 +53,13 @@
   {"code":"ff","name":"Fula; Fulah; Pulaar; Pular","nativeName":"Fulfulde, Pulaar, Pular"},
   {"code":"gl","name":"Galician","nativeName":"Galego"},
   {"code":"ka","name":"Georgian","nativeName":"ქართული"},
-  {"code":"de","name":"German","nativeName":"Deutsch"},
+
   {"code":"el","name":"Greek, Modern","nativeName":"Ελληνικά"},
   {"code":"gn","name":"Guaraní","nativeName":"Avañeẽ"},
   {"code":"gu","name":"Gujarati","nativeName":"ગુજરાતી"},
   {"code":"ht","name":"Haitian; Haitian Creole","nativeName":"Kreyòl ayisyen"},
   {"code":"ha","name":"Hausa","nativeName":"Hausa, هَوُسَ"},
-  {"code":"he","name":"Hebrew (modern)","nativeName":"עברית"},
+
   {"code":"hz","name":"Herero","nativeName":"Otjiherero"},
   {"code":"hi","name":"Hindi","nativeName":"हिन्दी, हिंदी"},
   {"code":"ho","name":"Hiri Motu","nativeName":"Hiri Motu"},
@@ -146,7 +150,7 @@
   {"code":"sl","name":"Slovene","nativeName":"slovenščina"},
   {"code":"so","name":"Somali","nativeName":"Soomaaliga, af Soomaali"},
   {"code":"st","name":"Southern Sotho","nativeName":"Sesotho"},
-  {"code":"es","name":"Spanish; Castilian","nativeName":"español, castellano"},
+
   {"code":"su","name":"Sundanese","nativeName":"Basa Sunda"},
   {"code":"sw","name":"Swahili","nativeName":"Kiswahili"},
   {"code":"ss","name":"Swati","nativeName":"SiSwati"},
@@ -161,7 +165,7 @@
   {"code":"tl","name":"Tagalog","nativeName":"Wikang Tagalog, ᜏᜒᜃᜅ᜔ ᜆᜄᜎᜓᜄ᜔"},
   {"code":"tn","name":"Tswana","nativeName":"Setswana"},
   {"code":"to","name":"Tonga (Tonga Islands)","nativeName":"faka Tonga"},
-  {"code":"tr","name":"Turkish","nativeName":"Türkçe"},
+
   {"code":"ts","name":"Tsonga","nativeName":"Xitsonga"},
   {"code":"tt","name":"Tatar","nativeName":"татарча, tatarça, تاتارچا‎"},
   {"code":"tw","name":"Twi","nativeName":"Twi"},

@@ -175,7 +175,7 @@ class Reviews extends MY_Controller {
                             'total_ratings' => $totalRatings,
                             'avg_rating' => number_format($avg_rating, 2),
                             'ratings' => $ratingsArr,
-                            'comments' => $comments
+                            'comments' => $comments,							'time'=>date("Y-m-d H:i:s"),
                         );
 
 

@@ -9,6 +9,7 @@
 class Drivers extends MY_Controller {
 
     function __construct() {
+
         parent::__construct();
         $this->load->helper(array('cookie', 'date', 'form', 'email'));
         $this->load->library(array('encrypt', 'form_validation'));
@@ -21,6 +22,7 @@ class Drivers extends MY_Controller {
 
         header('Content-type:application/json;charset=utf-8');
 		/* Authentication Begin */
+        var_dump(123);die;
         $headers = $this->input->request_headers();
         if (array_key_exists("Apptype", $headers))
             $this->Apptype = $headers['Apptype'];
@@ -400,6 +402,7 @@ class Drivers extends MY_Controller {
      *
      * */
     public function accept_ride() {
+        var_dump(123);die;
         $returnArr['status'] = '0';
         $returnArr['response'] = '';
         try {

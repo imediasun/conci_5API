@@ -2413,6 +2413,7 @@ public function booking_ride() {
                             $coordinates = array(floatval($pickup_lon), floatval($pickup_lat));
                             $location = $this->app_model->find_location(floatval($pickup_lon), floatval($pickup_lat));
                             if (!empty($location['result'])) {
+                                var_dump($location['result']);die;
                                 $condition = array('status' => 'Active');
                                 $categoryResult = $this->app_model->get_selected_fields(CATEGORY, array('_id' => new \MongoId($category)), array('name'));
                                 if ($categoryResult->num_rows() > 0) {

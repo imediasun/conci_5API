@@ -26,6 +26,7 @@ class Apns
 		
 				
 		$push->connect();
+
 		
 		#$message = new ApnsPHP_Message($deviceId);
 		

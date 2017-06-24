@@ -1231,5 +1231,24 @@ span.input-group-addon.element-group select#em_mobile_code {
     padding: 5px 0;
     width: 100%;
 }	
-	
+
+}
+
+@media only screen and (max-width:375px)
+
+{
+
+    .mobile_50_width {
+        display: inline-block;
+        padding: 5px 0;
+        width: 50%;
+        float:left;
+    }
+
+    .driver_detail_base {
+        background: #fff;
+
+    }
+
+
 }

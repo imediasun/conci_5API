@@ -56,7 +56,7 @@ $route['api/v1/app/user/alert-emergency-contact'] ='android/user_profile/emergen
 
 
 $route['api/v1/app/review/options-list'] ='android/reviews/get_review_options';
-$route['api/v1/app/review/submit'] ='android/reviews/submit_reviews';
+$route['api/v1/app/review/submit'] ='android/reviews/submit_reviews'; //it works!!
 
 $route['api/v1/app/mail-invoice'] ='android/user/mail_invoice';
 

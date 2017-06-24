@@ -170,7 +170,9 @@ class App_driver extends MY_Controller {
 		 # $this->setErrorMessage('error', 'Sorry, Could not find your vehicle category please try again');
           redirect('app/driver/signup');
 		}
-        $this->data['vehicle_types'] = $this->driver_model->get_vehicles_list_by_category($get_vehicle_catId->vehicle_type);
+        /*$this->data['vehicle_types'] = $this->driver_model->get_vehicles_list_by_category($get_vehicle_catId->vehicle_type);*/
+        $this->data['vehicle_types'] = $this->driver_model->get_all_details(VEHICLES);
+
         $this->data['docx_list'] = $this->driver_model->get_all_details(DOCUMENTS, array('status' => 'Active'));
         $this->data['categoryDetail'] = $get_vehicle_catId;
         $this->data['brandList'] = $this->driver_model->get_all_details(BRAND, array('status' => 'Active'), array('brand_name' => 'ASC'));
@@ -185,6 +187,8 @@ class App_driver extends MY_Controller {
             $this->data['languagesList'][$i]->name=$obj->name;
             $i++;
         }
+
+        //get vehicle type
 
         $this->load->view('driver/forapp/register.php', $this->data);
     }
