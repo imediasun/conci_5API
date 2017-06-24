@@ -40,7 +40,7 @@ $route['v3/app/get-year-list'] = 'api_v3/drivers/get_year_list';
 $route['v3/app/send-otp-driver'] = 'api_v3/drivers/send_otp_driver';
 $route['v3/app/save-image'] = 'api_v3/drivers/upload_image';
 $route['v3/app/register-driver'] = 'api_v3/drivers/register';
-//provider_last_job
+///provider_last_job
 $route['v3/app/get-provider-last-job'] = 'api_v3/drivers/provider_last_job';
 //provider_last_job_summary
 $route['v3/app/get-provider-last-job-summery'] = 'api_v3/drivers/provider_last_job_summery';
