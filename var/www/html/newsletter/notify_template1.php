@@ -1,1 +1,0 @@
-<?php $message .= '<p>This is just a description of an email</p>';  ?>
