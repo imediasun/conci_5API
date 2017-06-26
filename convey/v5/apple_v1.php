@@ -56,6 +56,8 @@ $route['v5/app/user/alert-emergency-contact'] = 'v5/mobile/user_profile/emergenc
 
 /**/
 $route['v5/user/user-data/edit'] ='v5/mobile/user/edit_user_data'; ///v5/user/user-data/edit
+
+
 $route['v5/user/user-image/edit'] ='v5/mobile/user/edit_user_image';
 /**/
 $route['v5/app/review/options-list'] = 'v5/mobile/reviews/get_review_options';
@@ -112,5 +114,9 @@ $route['v5/provider/get-provider-last-job'] = 'v5/mobile/drivers/provider_last_j
 $route['v5/provider/get-provider-last-job-summery'] = 'v5/mobile/drivers/provider_last_job_summery';
 //provider_reviews
 $route['v5/provider/get-provider-reviews'] = 'v5/mobile/drivers/get_provider_reviews';
+/*Driver data edit*/
+$route['v5/provider/driver-data/edit'] ='v5/mobile/drivers/edit_driver_data';
+/*Driver image upload*/
+$route['v5/provider/driver-image/edit'] ='v5/mobile/drivers/edit_provider_image';
 
 

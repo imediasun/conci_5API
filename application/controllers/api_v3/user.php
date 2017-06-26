@@ -765,7 +765,7 @@ class User extends MY_Controller {
             $image = $this->input->post('image');
             $params_to_change = array();
             if (isset($name) && !empty($name)) {
-                $params_to_change['use_name'] = $name;
+                $params_to_change['user_name'] = $name;
             }
             if (isset($image) && !empty($image)) {
                 $params_to_change['image'] = $image;
@@ -785,15 +785,22 @@ class User extends MY_Controller {
                 if (!empty($user_id)) {
                     $user_details = $this->app_model->get_selected_fields(USERS, array('_id' => new MongoId($user_id)), array('_id'));
                     if ($user_details->num_rows() > 0) {
+						
                         if (count($params_to_change) > 0) {
                             $i = 0;
                             foreach ($params_to_change as $key => $val) {
                                 $field = [
                                     $key => $val
                                 ];
+								
                                 if ($this->user_model->update_details(USERS, $field, array('_id' => new MongoId($user_id)))) {
                                     $returnArr['status'] = '1';
                                 }
+								else{
+									
+								var_dump('Can not add information to database');die;	
+								}
+								
                                 $string = $key . " changed successfuly";
 
                                 $returnArr['response']['message'][$i] = $this->format_string($string, $string);

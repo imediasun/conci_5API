@@ -145,6 +145,7 @@ class App_model extends My_Model {
                     'driver_name' => 1,
                     'loc' => 1,
                     'availability' => 1,
+					'vehicle_type' => 1,
                     'status' => 1,
                     'mode' => 1,
                     'push_notification' => 1,

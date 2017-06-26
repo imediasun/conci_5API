@@ -15,6 +15,7 @@ class Drivers extends MY_Controller {
         $this->load->model(array('driver_model'));
         $this->load->model(array('app_model'));
 		$this->load->model(array('review_model'));
+		$this->load->model(array('location_model'));
 		
 		/* Authentication Begin */
         $headers = $this->input->request_headers();
@@ -3149,12 +3150,20 @@ class Drivers extends MY_Controller {
 
     public function provider_last_job_summery()
     {
+		
+		//добавляем валюту
         $returnArr['status'] = '0';
         $returnArr['response'] = '';
 
         $driver_id = $this->input->post('driver_id');
         $checkDriver = $this->app_model->get_selected_fields(DRIVERS, array('_id' => new \MongoId($driver_id)));
+		
         if ($checkDriver->num_rows() > 0) {
+		//get currency
+		$checkLocation = $this->location_model->get_selected_fields(LOCATIONS, array('_id' => new \MongoId($checkDriver->row()->driver_location)),array('currency'));
+		 $finalArr['currency']=$checkLocation->row()->currency;
+		
+			
             $checkRide = $this->app_model->get_selected_fields(RIDES, array('driver.id' => $driver_id));
             if ($checkRide->num_rows() > 0) {
                 try {
@@ -3172,24 +3181,25 @@ class Drivers extends MY_Controller {
                     $begin_time = date('m/d/Y H:i:s', $begin_timestamp);
                     $end_timestamp = $val['history']['end_ride']->sec;
                     $end_time = date('m/d/Y H:i:s', $end_timestamp);
-                    $finalArr[$i]['ride_total_time_min'] = (strtotime($end_time) - strtotime($begin_time)) / 60;
-                    $finalArr[$i]['ride_id'] = $val['ride_id'];
-                    $finalArr[$i]['ride_status'] = $val['ride_status'];
+                    $finalAr['ride_total_time_min'] = (strtotime($end_time) - strtotime($begin_time)) / 60;
+                    $finalAr['ride_id'] = $val['ride_id'];
+                    $finalAr['ride_status'] = $val['ride_status'];
                     //Get user information
                     $checkUser = $this->app_model->get_selected_fields(USERS, array('_id' => new \MongoId($val['user']['id'])), array('image', 'user_name'));
                     if (isset($checkUser->row()->image)) {
                         if ($checkUser->row()->image != '') {
-                            $finalArr[$i]['user']['image'] = USER_PROFILE_IMAGE . $checkUser->row()->image;
+                            $finalAr['user']['image'] = USER_PROFILE_IMAGE . $checkUser->row()->image;
                         }
                     }
-                    $finalArr[$i]['user']['user_name'] = $checkUser->row()->user_name;
+                    $finalArr['user']['user_name'] = $checkUser->row()->user_name;
                     //Get payment method
                     $checkPayment = $this->app_model->get_selected_fields(PAYMENTS, array('ride_id' => $val['ride_id']), array('transactions'));
-                    $finalArr[$i]['payment_method'] = $checkPayment->row()->transactions;
+                    $finalAr['payment_method'] = $checkPayment->row()->transactions;
+					$finalArr['trips'][]=$finalAr;
                     $i++;
                 }
                 $returnArr['status'] = '1';
-                $returnArr['response'] = array('response' => $finalArr, 'message' => $this->format_string('You can see all jobs of your provider', 'success latest provider job'));
+                $returnArr['response'] = array('summary' => $finalArr, 'message' => $this->format_string('You can see all jobs of your provider', 'success latest provider job'));
             } else {
                 $returnArr['response'] = $this->format_string('Records not available', 'no_records_found');
             }

@@ -339,7 +339,8 @@ class App_driver extends MY_Controller {
             'mode' => 'Available',
             'dail_code' => (string) $this->session->userdata(APP_NAME.'otp_country_code'),
             'mobile_number' => (string) $this->session->userdata(APP_NAME.'otp_phone_number'),
-            'category' => new \MongoId($this->input->post('category'))
+            'category' => new \MongoId($this->input->post('category')),
+			'verify_status' => 'No'
         );
 
 

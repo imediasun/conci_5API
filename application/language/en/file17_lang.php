@@ -88,4 +88,14 @@ $lang['admin_please_select']='Please select';
 $lang['admin_setting_google_secret_key']='Please enter the google secret key';
 $lang['admin_setting_sno']='Sl No';
 $lang['admin_settings_about_us']='About us';
+/*Liabilities*/
+$lang['know_your_city']='Know your city.';
+$lang['you_need_to_be_familiar']='You need to be familiar with all the best locations in the city';
+$lang['provide_a_good_service']='Provide a good and honest service.';
+$lang['you_tneed_to_be_friendly']='You need to be friendly, truthful, Informative, make the clients feel local and be close with them.';
+$lang['dress_respectfully']='Dress Respectfully.';
+$lang['you_need_to_dress']="You need to dress appropriately to where you will be going whether it's a festival, restaurant or a club.";
+$lang['conci_guide_verification']='Conci Guide Verification.';
+$lang['you_will_be_asked_criminal_history']="You will be asked to Provide us your documents in order to verify Your identity and you don't have a criminal history.";
+
 ?>

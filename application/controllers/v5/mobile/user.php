@@ -23,7 +23,7 @@ class User extends MY_Controller {
 		if (array_key_exists("Authkey", $headers)) $auth_key = $headers['Authkey']; else $auth_key = "";
 		if(stripos($auth_key,APP_NAME) === false) {
 			$cf_fun= $this->router->fetch_method();
-			$apply_function = array('check_account','check_social_login','register_user','social_Login','login_user','proceed_payment','edit_user_image','edit_user_data','booking_ride');
+			$apply_function = array('check_account','check_social_login','register_user','social_Login','login_user','proceed_payment','edit_user_image','edit_user_data','booking_ride','all_ride_list','get_drivers_in_map');
 			if(!in_array($cf_fun,$apply_function)){
 				show_404();
 			}
@@ -1572,6 +1572,7 @@ class User extends MY_Controller {
 							}
 
 							$driverList = $this->app_model->get_nearest_driver($coordinates, $category, $limit);
+							
 							$driversArr = array();
 							if (!empty($driverList['result'])) {
 								foreach ($driverList['result'] as $driver) {
@@ -1580,6 +1581,11 @@ class User extends MY_Controller {
 									$driversArr[] = array('lat' => $lat,
 										'lon' => $lon
 									);
+									/* var_dump($driver['vehicle_type']);die; */
+									$checkModel = $this->app_model->get_selected_fields(VEHICLES, array('_id' => new \MongoId($driver['vehicle_type'])), array('max_seating'));
+									
+									$driversArr[]['maxPerson']=$checkModel->row()->max_seating; 
+									$driversArr[]['bookingFee']='';
 								}
 							}
 							if (empty($categoryArr)) {
@@ -1589,6 +1595,8 @@ class User extends MY_Controller {
 							} if (empty($rateCard)) {
 								$rateCard = json_decode("{}");
 							}
+							
+							
 							$returnArr['status'] = '1';
 							$returnArr['response'] = array('currency' => (string) $this->data['dcurrencyCode'], 'category' => $categoryArr, 'drivers' => $driversArr, 'ratecard' => $rateCard, 'selected_category' => (string) $category);
 						} else {
@@ -3177,7 +3185,7 @@ public function booking_ride() {
      *
      * */
     public function all_ride_list() {
-        $returnArr['status'] = '0';
+		$returnArr['status'] = '0';
         $returnArr['response'] = '';
         try {
             $user_id = (string) $this->input->post('user_id');
@@ -3188,10 +3196,11 @@ public function booking_ride() {
             if ($user_id != '') {
                 $userVal = $this->app_model->get_selected_fields(USERS, array('_id' => new \MongoId($user_id)), array('city', 'avail_category'));
                 if ($userVal->num_rows() > 0) {
-                    $checkRide = $this->app_model->get_ride_list($user_id, $type, array('booking_information', 'ride_id', 'ride_status'));
+                    $checkRide = $this->app_model->get_ride_list($user_id, $type, array('booking_information', 'ride_id', 'ride_status','total.total_fare','history.begin_ride','history.end_ride'));
                     $rideArr = array();
                     if ($checkRide->num_rows() > 0) {
                         foreach ($checkRide->result() as $ride) {
+							
                             $group = 'all';
                             if ($ride->ride_status == 'Booked' || $ride->ride_status == 'Confirmed' || $ride->ride_status == 'Arrived') {
                                 $group = 'upcoming';
@@ -3212,8 +3221,22 @@ public function booking_ride() {
                             } else if ($ride->ride_status == 'Arrived' || $ride->ride_status == 'Onride') {
                                 $disp_status = $this->format_string("On Ride", "on_ride");
                             }
+							$begin_timestamp=$ride->history['begin_ride']->sec;
+							$begin_time= date('m/d/Y H:i:s', $begin_timestamp);
+							$end_timestamp=$ride->history['end_ride']->sec;
+							$end_time= date('m/d/Y H:i:s', $end_timestamp);
+							$ride_total_time_min = (strtotime ($end_time)-strtotime ($begin_time))/60;
+							if($ride->total['total_fare']===null){
+									$total_fare=0;
+								}
+								else{
+									 $total_fare=$ride->total['total_fare'];
+								}
 							if ($ride->ride_status != 'Expired') {
 								$rideArr[] = array('ride_id' => $ride->ride_id,
+								'total_time_minutes'=>$ride_total_time_min,
+								
+								'total_fare'=>$total_fare,
 									'ride_time' => date("h:i A", $ride->booking_information['booking_date']->sec),
 									'ride_date' => date("jS M, Y", $ride->booking_information['booking_date']->sec),
 									'pickup' => $ride->booking_information['pickup']['location'],
@@ -3224,13 +3247,26 @@ public function booking_ride() {
 								);
 							}
                         }
+						$$total['total_time_minutes']=0;
+						$total['total_fare']=0;
+						foreach($rideArr as $key=>$val){
+							
+								$total['total_time_minutes']=$total['total_time_minutes']+$val['total_time_minutes'];
+						
+								$total['total_fare']=$total['total_fare']+$val['total_fare'];
+						
+							
+						}
+						
+						
+						
                     }
                     if (empty($rideArr)) {
                         $rideArr = json_decode("{}");
                     }
                     $total_rides = intval($checkRide->num_rows());
                     $returnArr['status'] = '1';
-                    $returnArr['response'] = array('total_rides' => (string) $total_rides, 'rides' => $rideArr);
+                    $returnArr['response'] = array('total'=>$total,'total_rides' => (string) $total_rides, 'rides' => $rideArr);
                 } else {
                     $returnArr['response'] = $this->format_string("Invalid User", "invalid_user");
                 }
@@ -4075,7 +4111,7 @@ public function booking_ride() {
 			
             $params_to_change = array();
             if (isset($name) && !empty($name)) {
-                $params_to_change['use_name'] = $name;
+                $params_to_change['user_name'] = $name;
             }
             if (isset($image) && !empty($image)) {
                 $params_to_change['image'] = $image;

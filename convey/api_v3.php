@@ -5,7 +5,7 @@ $route['api/v3/app/favourite-driver/remove'] ='api_v3/user/remove_favourite_driv
 $route['api/v3/app/favourite-driver/list'] ='api_v3/user/display_favourite_driver';
 /*Edit user data*/
 $route['api/v3/app/user-data/edit'] ='api_v3/user/edit_user_data';
-/**/
+
 $route['api/v3/social-login'] = 'api_v3/user/social_login';
 
 $route['api/xmpp-status'] ='api_v3/common/update_receive_mode';

@@ -358,7 +358,7 @@ $(document).ready(function(){
 													$verify_status = get_language_value_for_keyword($row->verify_status,$this->data['langCode']);;
 												}
 											}else{
-												$verify_status = get_language_value_for_keyword('No',$this->data['langCode']);;
+												$verify_status = get_language_value_for_keyword('Not',$this->data['langCode']);;
 											}
                                             if ($allPrev == '1' || in_array('2', $driver)) {
                                                 if ($row->verify_status == 'Yes') {

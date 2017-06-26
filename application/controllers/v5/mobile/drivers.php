@@ -24,7 +24,7 @@ class Drivers extends MY_Controller {
 		if (array_key_exists("Authkey", $headers)) $auth_key = $headers['Authkey']; else $auth_key = "";
 		if(stripos($auth_key,APP_NAME) === false) {
 			$cf_fun= $this->router->fetch_method();
-			$apply_function = array('login_driver','update_driver_location','get_provider_reviews','provider_last_job','provider_last_job_summery','accept_ride');
+			$apply_function = array('login_driver','update_driver_location','get_provider_reviews','provider_last_job','provider_last_job_summery','accept_ride','edit_driver_data','edit_provider_image');
 			if(!in_array($cf_fun,$apply_function)){
 				show_404();
 			}
@@ -3320,6 +3320,138 @@ class Drivers extends MY_Controller {
         echo $this->cleanString($json_encode);
 
 
+    }
+	
+	    public function edit_driver_data()
+    {
+
+        $returnArr['status'] = '0';
+        $returnArr['response'] = '';
+        try {
+            $email = trim($this->input->post('email'));
+            $phone = trim($this->input->post('phone'));
+            $name = trim($this->input->post('name'));
+            $driver_id = $this->input->post('driver_id');
+            /*$last_name = $this->input->post('last_name');*/
+            $image = $this->input->post('image');
+            $params_to_change = array();
+            if (isset($name) && !empty($name)) {
+                $params_to_change['driver_name'] = $name;
+            }
+            if (isset($image) && !empty($image)) {
+                $params_to_change['image'] = $image;
+            }
+            if (isset($phone) && !empty($phone)) {
+                $params_to_change['phone_number'] = $phone;
+            }
+            if (isset($email) && !empty($email)) {
+                $params_to_change['email'] = $email;
+            }
+            /*if(isset($last_name)){
+                $params_to_change['last_name']=$last_name;
+            }*/
+
+
+            if (isset($driver_id)) {
+                if (!empty($driver_id)) {
+                    $driver_details = $this->app_model->get_selected_fields(DRIVERS, array('_id' => new MongoId($driver_id)), array('_id'));
+                    if ($driver_details->num_rows() > 0) {
+						
+                        if (count($params_to_change) > 0) {
+                            $i = 0;
+                            foreach ($params_to_change as $key => $val) {
+                                $field = [
+                                    $key => $val
+                                ];
+								
+                                if ($this->user_model->update_details(DRIVERS, $field, array('_id' => new MongoId($driver_id)))) {
+                                    $returnArr['status'] = '1';
+                                }
+								else{
+									
+								var_dump('Can not add information to database');die;	
+								}
+								
+                                $string = $key . " changed successfuly";
+
+                                $returnArr['response']['message'][$i] = $this->format_string($string, $string);
+                                $i++;
+                            }
+
+                        } else {
+                            $returnArr['response'] = $this->format_string("No parametres to change", "no_params_to_change");
+                        }
+                    } else {
+                        $returnArr['response'] = $this->format_string("Invalid Driver", "invalid_driver");
+                    }
+                } else {
+                    $returnArr['response'] = $this->format_string("Some Parameters are missing", "some_parameters_missing");
+                }
+            } else {
+                $returnArr['response'] = $this->format_string("Some Parameters are missing", "some_parameters_missing");
+            }
+        } catch (MongoException $ex) {
+            $returnArr['response'] = $this->format_string("Error in connection", "error_in_connection");
+        }
+        $json_encode = json_encode($returnArr, JSON_PRETTY_PRINT);
+        echo $this->cleanString($json_encode);
+    }
+	
+	   public function edit_provider_image()
+    {
+
+        $returnArr['status'] = '0';
+        $returnArr['response'] = '';
+        try {
+			
+            $driver_id = $this->input->post('driver_id');
+            $dir = 'images/drivers/';
+            $file = $_FILES['image']['name'];
+			
+			if (move_uploaded_file($_FILES['image']['tmp_name'], $dir.$file)) {
+            $image_status=1;
+
+        } else {
+			
+           $image_status=0;
+        }
+		
+			
+           if (isset($driver_id) and isset($file)) {
+                if (!empty($driver_id)) {
+					
+                    $driver_details = $this->driver_model->get_selected_fields(DRIVERS, array('_id' => new MongoId($driver_id)) );
+					
+                    if ($driver_details->num_rows() > 0) {
+						if($image_status==1){
+                    
+                                if ($this->driver_model->update_details(DRIVERS,array('image'=>$file), array('_id' => new MongoId($driver_id)))) {
+                                    $returnArr['status'] = '1';
+                                }
+                                $string ="image changed successfuly";
+
+                                $returnArr['response']['message'][$i] = $this->format_string($string, $string);
+                                
+                     
+						}
+						else{
+						$returnArr['response'] = $this->format_string("Problem with image uploading", "image_uploading_problem");	
+					  }
+                       
+                    } else {
+                        $returnArr['response'] = $this->format_string("Invalid Driver", "invalid_driver");
+                    }
+                } else {
+                    $returnArr['response'] = $this->format_string("Some Parameters are missing", "some_parameters_missing");
+                }
+            } else {
+                $returnArr['response'] = $this->format_string("Some Parameters are missing", "some_parameters_missing");
+            }
+        } catch (MongoException $ex) {
+            $returnArr['response'] = $this->format_string("Error in connection", "error_in_connection");
+        }
+        $json_encode = json_encode($returnArr, JSON_PRETTY_PRINT);
+        echo $this->cleanString($json_encode);
     }
 
 }

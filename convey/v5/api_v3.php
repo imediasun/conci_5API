@@ -39,5 +39,5 @@ $route['v5/v3/app/send-otp-driver'] = 'v5/api_v3/drivers/send_otp_driver';
 $route['v5/v3/app/save-image'] = 'v5/api_v3/drivers/upload_image';
 $route['v5/v3/app/register-driver'] = 'v5/api_v3/drivers/register';
 
-
+$route['v5/api/v3/app/get-notification-list'] ='v5/api_v3/common/get_notification_list';
 ?>

@@ -403,41 +403,41 @@ else
                                 <div class="panel panel-default form-panel">
                                     <div class="panel-heading text-left">
                                         <span class="welcoming"></span>
-                                        <h4 class="panel-title">Welcoming</h4>
+                                        <h4 class="panel-title"><?php if ($this->lang->line('know_your_city') != '') echo stripslashes($this->lang->line('know_your_city')); else echo 'Know your city.'; ?></h4>
                                         <span class="check-icon"></span>
                                     </div>
                                     <div class="panel-body text-left">
-                                        Lorem ipsum is simply dummy text of the printing and typesetting industry
+                                        <?php if ($this->lang->line('you_need_to_be_familiar') != '') echo stripslashes($this->lang->line('you_need_to_be_familiar')); else echo 'You need to be familiar with all the best locations in the city'; ?>
                                     </div>
                                 </div>
                                 <div class="panel panel-default form-panel">
                                     <div class="panel-heading text-left">
                                         <span class="clothing"></span>
-                                        <h4 class="panel-title">Clothing respected</h4>
+                                        <h4 class="panel-title"><?php if ($this->lang->line('provide_a_good_service') != '') echo stripslashes($this->lang->line('provide_a_good_service')); else echo 'Provide a good and honest service.'; ?></h4>
                                         <span class="check-icon"></span>
                                     </div>
                                     <div class="panel-body text-left">
-                                        Lorem ipsum is simply dummy text of the printing and typesetting industry
+                                        <?php if ($this->lang->line('you_tneed_to_be_friendly') != '') echo stripslashes($this->lang->line('you_tneed_to_be_friendly')); else echo 'You need to be friendly, truthful, Informative, make the clients feel local and be close with them.'; ?>
                                     </div>
                                 </div>
                                 <div class="panel panel-default form-panel">
                                     <div class="panel-heading text-left">
                                         <span class="privacy"></span>
-                                        <h4 class="panel-title">Privacy</h4>
+                                        <h4 class="panel-title"> <?php if ($this->lang->line('dress_respectfully') != '') echo stripslashes($this->lang->line('dress_respectfully')); else echo 'Dress Respectfully.'; ?></h4>
                                         <span class="check-icon"></span>
                                     </div>
                                     <div class="panel-body text-left">
-                                        Lorem ipsum is simply dummy text of the printing and typesetting industry
+                                        <?php if ($this->lang->line('you_need_to_dress') != '') echo stripslashes($this->lang->line('you_need_to_dress')); else echo "You need to dress appropriately to where you will be going whether it's a festival, restaurant or a club."; ?>
                                     </div>
                                 </div>
                                 <div class="panel panel-default form-panel">
                                     <div class="panel-heading text-left">
                                         <span class="criminal"></span>
-                                        <h4 class="panel-title">No criminal record</h4>
+                                        <h4 class="panel-title"><?php if ($this->lang->line('conci_guide_verification') != '') echo stripslashes($this->lang->line('conci_guide_verification')); else echo 'Conci Guide Verification.'; ?></h4>
                                         <span class="check-icon"></span>
                                     </div>
                                     <div class="panel-body text-left">
-                                        Lorem ipsum is simply dummy text of the printing and typesetting industry
+                                        <?php if ($this->lang->line('you_will_be_asked_criminal_history') != '') echo stripslashes($this->lang->line('you_will_be_asked_criminal_history')); else echo "You will be asked to Provide us your documents in order to verify Your identity and you don't have a criminal history."; ?>
                                     </div>
                                 </div>
                             </div>
@@ -468,6 +468,20 @@ else
 
 
     <script src="js/jquery.validate.js"></script> 
+	<script>
+	$('.submit-btn').click(function(e){
+		e.preventDefault();
+		if($('.onoffswitch-checkbox').is(':checked')){
+		$('#driver_register_form').submit()	
+			
+		}
+		else{
+		alert('You disagreed with the terms');	
+		}
+		
+	})
+	
+	</script>
 
 	<script>
 	

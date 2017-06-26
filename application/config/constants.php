@@ -92,6 +92,7 @@ define('LANGUAGES', COL_PREF . 'languages');
 define('MOBILE_LANGUAGES', COL_PREF . 'mobile_languages');
 
 define('NOTIFICATION_TEMPLATES', COL_PREF . 'notification_templates');
+define('NOTIFICATIONS', COL_PREF . 'notifications');
 define('LANDING_CONTENT', COL_PREF . 'landing_content');
 define('INVOICE', COL_PREF . 'invoice_template');
 

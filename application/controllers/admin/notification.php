@@ -11,8 +11,8 @@ class Notification extends MY_Controller {
         parent::__construct();
         $this->load->helper(array('cookie', 'date', 'form'));
         $this->load->library(array('encrypt', 'form_validation','curl'));
-        $this->load->model('notification_model','notify_model');
-
+        $this->load->model(array('admin_model','notify_model'));
+ 
         if ($this->checkPrivileges('user', $this->privStatus) == FALSE) {
             redirect('admin');
         }
@@ -321,6 +321,14 @@ class Notification extends MY_Controller {
                 }
             }
         }
+		$dataArr = array(
+			'user_id' => new \MongoId($userIds),
+				
+			'notification_template_id'=>$getTemplateDetails->row()->_id,
+			'user_type'=>$user_type,
+			'time_'=>date("Y-m-d H:i:s")
+			);
+		$this->admin_model->simple_insert(NOTIFICATIONS, $dataArr);
         $message = $title;
 
         if (!empty($android_user)) {
@@ -336,15 +344,10 @@ class Notification extends MY_Controller {
              *
              * */
 
-			$dataArr = array(
-			'user_id' => new \MongoId($userIds),
-				
-			'notification_template_id'=>$getTemplateDetails->row()->_id,
-			'user_type'=>$user_type
-			);
+			
 
 
-			$this->cimongo->insert(NOTIFICATIONS, $dataArr);
+		
         $this->setErrorMessage('success', 'Notifications Sent.','admin_notification_sent');
         redirect('admin/notification/display_notification_user_list');
 		
@@ -442,6 +445,15 @@ class Notification extends MY_Controller {
         }
 
         $message = $title;
+		$dataArr = array( 'user_id' => new \MongoId($userIds),
+		'notification_template_id'=>new \MongoId($getTemplateDetails->row()->_id), 
+		'user_type'=>$user_type,
+		'time_'=>date("Y-m-d H:i:s"),
+		);
+
+
+		$this->admin_model->simple_insert(NOTIFICATIONS, $dataArr); 
+		
 		
         if (!empty($android_driver)) {
             /*echo "android_driver";
@@ -461,13 +473,7 @@ class Notification extends MY_Controller {
 		 *
 		 * */
 
-		$dataArr = array('user_id' => new \MongoId($userIds),
-		'notification_template_id'=>new \MongoId($getTemplateDetails->row()->_id),
-		'user_type'=>$user_type
-		);
-
-
-		$this->cimongo->insert(NOTIFICATIONS, $dataArr);
+		
         $this->setErrorMessage('success', 'Notifications Sent to the driver.','admin_notification_sent');
         redirect('admin/notification/display_notification_driver_list');
     
