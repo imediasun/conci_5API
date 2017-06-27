@@ -23,7 +23,7 @@ class User extends MY_Controller {
 		if (array_key_exists("Authkey", $headers)) $auth_key = $headers['Authkey']; else $auth_key = "";
 		if(stripos($auth_key,APP_NAME) === false) {
 			$cf_fun= $this->router->fetch_method();
-			$apply_function = array();
+			$apply_function = array('track_driver_location');
 			if(!in_array($cf_fun,$apply_function)){
 				show_404();
 			}
@@ -667,6 +667,7 @@ class User extends MY_Controller {
                         'phone_number' => (string) $checkDriver->row()->dail_code . $checkDriver->row()->mobile_number,
                         'vehicle_number' => (string) $checkDriver->row()->vehicle_number,
                         'vehicle_model' => (string) $vehicle_model,
+                        //'driver_language'=> $checkDriver->row()->languages,
                         'ride_status' => (string) $checkRide->row()->ride_status,
                         'pickup' => $pickup_arr,
                         'drop' => $drop_arr

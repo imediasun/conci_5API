@@ -24,7 +24,7 @@ class Drivers extends MY_Controller {
 		if (array_key_exists("Authkey", $headers)) $auth_key = $headers['Authkey']; else $auth_key = "";
 		if(stripos($auth_key,APP_NAME) === false) {
 			$cf_fun= $this->router->fetch_method();
-			$apply_function = array('login_driver','update_driver_location','get_provider_reviews','provider_last_job','provider_last_job_summery','accept_ride','edit_driver_data','edit_provider_image');
+			$apply_function = array('login_driver','update_driver_location','get_provider_reviews','provider_last_job','provider_last_job_summery','accept_ride','edit_driver_data','edit_provider_image','if_driver_onride');
 			if(!in_array($cf_fun,$apply_function)){
 				show_404();
 			}
@@ -3171,12 +3171,18 @@ class Drivers extends MY_Controller {
                     $finalArr[$i]['ride_status'] = $val['ride_status'];
                     //Get user information
                     $checkUser = $this->app_model->get_selected_fields(USERS, array('_id' => new \MongoId($val['user']['id'])),array('image','user_name'));
+                   
                     if (isset($checkUser->row()->image)) {
                         if ($checkUser->row()->image != '') {
                             $finalArr[$i]['user']['image'] = USER_PROFILE_IMAGE . $checkUser->row()->image;
                         }
                     }
-                    $finalArr[$i]['user']['user_name']=$checkUser->row()->user_name;
+                    if (isset($checkUser->row()->user_name)) {
+                        if ($checkUser->row()->user_name != '') {
+                            $finalArr[$i]['user']['user_name']=$checkUser->row()->user_name;
+                        }
+                    }
+
                     //Get payment method
                     $checkPayment = $this->app_model->get_selected_fields(PAYMENTS, array('ride_id' => $val['ride_id']),array('transactions'));
                     $finalArr[$i]['payment_method']=$checkPayment->row()->transactions;
@@ -3438,6 +3444,54 @@ class Drivers extends MY_Controller {
 						$returnArr['response'] = $this->format_string("Problem with image uploading", "image_uploading_problem");	
 					  }
                        
+                    } else {
+                        $returnArr['response'] = $this->format_string("Invalid Driver", "invalid_driver");
+                    }
+                } else {
+                    $returnArr['response'] = $this->format_string("Some Parameters are missing", "some_parameters_missing");
+                }
+            } else {
+                $returnArr['response'] = $this->format_string("Some Parameters are missing", "some_parameters_missing");
+            }
+        } catch (MongoException $ex) {
+            $returnArr['response'] = $this->format_string("Error in connection", "error_in_connection");
+        }
+        $json_encode = json_encode($returnArr, JSON_PRETTY_PRINT);
+        echo $this->cleanString($json_encode);
+    }
+
+    public function if_driver_onride()
+    {
+
+        $returnArr['status'] = '0';
+        $returnArr['response'] = '';
+        try {
+
+            $driver_id = $this->input->post('driver_id');
+
+
+            if (isset($driver_id) ) {
+                if (!empty($driver_id)) {
+                    $driver_details = $this->app_model->get_selected_fields(DRIVERS, array('_id' => new MongoId($driver_id)), array('_id'));
+                    if ($driver_details->num_rows() > 0) {
+
+                        $onride_details = $this->app_model->get_selected_fields(RIDES, array('driver.id' => $driver_id,'ride_status'=>'Onride'), array('ride_id'));
+
+                        if($onride_details->num_rows() > 0){
+
+                            $returnArr['status'] = '1';
+
+                            $returnArr['response'] = array('ride_id' => $onride_details->row()->ride_id, 'message'=>'Driver is onride'
+                            );
+                        }
+                        else {
+                            $returnArr['response'] = $this->format_string("This driver is not onride now", "invalid_driver");
+                        }
+
+
+
+
+
                     } else {
                         $returnArr['response'] = $this->format_string("Invalid Driver", "invalid_driver");
                     }

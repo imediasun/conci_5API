@@ -114,5 +114,7 @@ $route['v5/api/v1/provider/get-provider-last-job'] = 'v5/android/drivers/provide
 $route['v5/api/v1/provider/get-provider-last-job-summery'] = 'v5/android/drivers/provider_last_job_summery';
 //provider_reviews
 $route['v5/api/v1/provider/get-provider-reviews'] = 'v5/android/drivers/get_provider_reviews';
+//provider_job_for today
+$route['v5/api/v1/provider/get-provider-today-jobs'] = 'v5/android/drivers/provider_today_jobs';
 
 

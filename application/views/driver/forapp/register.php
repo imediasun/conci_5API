@@ -402,7 +402,10 @@ else
                             <div class="col-lg-12 sign_up_base ">
                                 <div class="panel panel-default form-panel">
                                     <div class="panel-heading text-left">
-                                        <span class="welcoming"></span>
+                                        <span class="welcoming">
+
+                                          <img style="height:100%" src="/img/Welcoming.svg">
+                                        </span>
                                         <h4 class="panel-title"><?php if ($this->lang->line('know_your_city') != '') echo stripslashes($this->lang->line('know_your_city')); else echo 'Know your city.'; ?></h4>
                                         <span class="check-icon"></span>
                                     </div>
@@ -412,7 +415,10 @@ else
                                 </div>
                                 <div class="panel panel-default form-panel">
                                     <div class="panel-heading text-left">
-                                        <span class="clothing"></span>
+                                        <span class="clothing">
+                                             <img style="height:100%" src="/img/Clothing respected.svg">
+
+                                        </span>
                                         <h4 class="panel-title"><?php if ($this->lang->line('provide_a_good_service') != '') echo stripslashes($this->lang->line('provide_a_good_service')); else echo 'Provide a good and honest service.'; ?></h4>
                                         <span class="check-icon"></span>
                                     </div>
@@ -422,7 +428,10 @@ else
                                 </div>
                                 <div class="panel panel-default form-panel">
                                     <div class="panel-heading text-left">
-                                        <span class="privacy"></span>
+                                        <span class="privacy">
+
+                                             <img style="height:100%" src="/img/privacy.svg">
+                                        </span>
                                         <h4 class="panel-title"> <?php if ($this->lang->line('dress_respectfully') != '') echo stripslashes($this->lang->line('dress_respectfully')); else echo 'Dress Respectfully.'; ?></h4>
                                         <span class="check-icon"></span>
                                     </div>
@@ -432,7 +441,10 @@ else
                                 </div>
                                 <div class="panel panel-default form-panel">
                                     <div class="panel-heading text-left">
-                                        <span class="criminal"></span>
+                                        <span class="criminal">
+                                            <img style="height:100%" src="/img/No criminal record.svg">
+
+                                        </span>
                                         <h4 class="panel-title"><?php if ($this->lang->line('conci_guide_verification') != '') echo stripslashes($this->lang->line('conci_guide_verification')); else echo 'Conci Guide Verification.'; ?></h4>
                                         <span class="check-icon"></span>
                                     </div>

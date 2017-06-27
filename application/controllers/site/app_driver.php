@@ -204,7 +204,7 @@ class App_driver extends MY_Controller {
         /**
          * clear the temp folders
          */
-      # echo '<pre>'; print_r($_POST); die;
+       #echo '<pre>'; print_r($_POST); die;
 
         /*$driver_id = $this->input->post('driver_id');
         */
@@ -342,6 +342,16 @@ class App_driver extends MY_Controller {
             'category' => new \MongoId($this->input->post('category')),
 			'verify_status' => 'No'
         );
+   /*     $lang[0]=$this->input->post('select-language1');
+        $lang[1]=$this->input->post('select-language2');
+        $lang[2]=$this->input->post('select-language3');
+        $lang[4]=$this->input->post('select-language4');
+        $result_lang = array_unique($lang);
+
+        foreach($result_lang as $lang){
+            $result_lang['vehicle_number'][]=$lang;
+
+        }*/
 
 
          if($this->input->post('driver_commission') == ''){
@@ -353,7 +363,7 @@ class App_driver extends MY_Controller {
 		}
 
 
-        $dataArr = array_merge($driver_data, /*$image_data,*/ $addressArr/*array('documents' => $documents)*/);
+        $dataArr = array_merge($driver_data, /*$image_data,*/ $addressArr/*array('documents' => $documents)*//*,$result_lang*/);
 
         $condition = array();
         $this->driver_model->commonInsertUpdate(DRIVERS, 'insert', $excludeArr, $dataArr, $condition);

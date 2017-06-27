@@ -1,0 +1,3 @@
+git log --oneline origin/master
+# assume the first sha is bbdfa17
+git reset --hard bbdfa17

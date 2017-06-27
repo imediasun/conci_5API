@@ -59,6 +59,8 @@ $route['v5/user/user-data/edit'] ='v5/mobile/user/edit_user_data'; ///v5/user/us
 
 
 $route['v5/user/user-image/edit'] ='v5/mobile/user/edit_user_image';
+
+$route['v5/user/if-user-onride'] = 'v5/mobile/user/if_user_onride';
 /**/
 $route['v5/app/review/options-list'] = 'v5/mobile/reviews/get_review_options';
 $route['v5/app/review/submit'] = 'v5/mobile/reviews/submit_reviews';
@@ -119,4 +121,4 @@ $route['v5/provider/driver-data/edit'] ='v5/mobile/drivers/edit_driver_data';
 /*Driver image upload*/
 $route['v5/provider/driver-image/edit'] ='v5/mobile/drivers/edit_provider_image';
 
-
+$route['v5/provider/if-driver-onride'] = 'v5/mobile/drivers/if_driver_onride';

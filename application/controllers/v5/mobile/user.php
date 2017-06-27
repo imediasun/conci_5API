@@ -23,7 +23,7 @@ class User extends MY_Controller {
 		if (array_key_exists("Authkey", $headers)) $auth_key = $headers['Authkey']; else $auth_key = "";
 		if(stripos($auth_key,APP_NAME) === false) {
 			$cf_fun= $this->router->fetch_method();
-			$apply_function = array('check_account','check_social_login','register_user','social_Login','login_user','proceed_payment','edit_user_image','edit_user_data','booking_ride','all_ride_list','get_drivers_in_map');
+			$apply_function = array('if_user_onride','check_account','check_social_login','register_user','social_Login','login_user','proceed_payment','edit_user_image','edit_user_data','booking_ride','all_ride_list','get_drivers_in_map');
 			if(!in_array($cf_fun,$apply_function)){
 				show_404();
 			}
@@ -4219,6 +4219,54 @@ public function booking_ride() {
         echo $this->cleanString($json_encode);
     }
 
+
+    public function if_user_onride()
+    {
+
+        $returnArr['status'] = '0';
+        $returnArr['response'] = '';
+        try {
+
+            $user_id = $this->input->post('user_id');
+
+
+            if (isset($user_id) ) {
+                if (!empty($user_id)) {
+                    $user_details = $this->app_model->get_selected_fields(USERS, array('_id' => new MongoId($user_id)), array('_id'));
+                    if ($user_details->num_rows() > 0) {
+
+                        $onride_details = $this->app_model->get_selected_fields(RIDES, array('user.id' => $user_id,'ride_status'=>'Onride'), array('ride_id'));
+
+                        if($onride_details->num_rows() > 0){
+
+                            $returnArr['status'] = '1';
+
+                            $returnArr['response'] = array('ride_id' => $onride_details->row()->ride_id, 'message'=>'User is onride'
+                            );
+                        }
+                        else {
+                            $returnArr['response'] = $this->format_string("This user is not onride now", "invalid_user");
+                        }
+
+
+
+
+
+                    } else {
+                        $returnArr['response'] = $this->format_string("Invalid User", "invalid_user");
+                    }
+                } else {
+                    $returnArr['response'] = $this->format_string("Some Parameters are missing", "some_parameters_missing");
+                }
+            } else {
+                $returnArr['response'] = $this->format_string("Some Parameters are missing", "some_parameters_missing");
+            }
+        } catch (MongoException $ex) {
+            $returnArr['response'] = $this->format_string("Error in connection", "error_in_connection");
+        }
+        $json_encode = json_encode($returnArr, JSON_PRETTY_PRINT);
+        echo $this->cleanString($json_encode);
+    }
 
     
 }

@@ -3186,15 +3186,19 @@ class Drivers extends MY_Controller {
                     $finalAr['ride_status'] = $val['ride_status'];
                     //Get user information
                     $checkUser = $this->app_model->get_selected_fields(USERS, array('_id' => new \MongoId($val['user']['id'])), array('image', 'user_name'));
+
+
                     if (isset($checkUser->row()->image)) {
                         if ($checkUser->row()->image != '') {
                             $finalAr['user']['image'] = USER_PROFILE_IMAGE . $checkUser->row()->image;
                         }
                     }
-                    $finalArr['user']['user_name'] = $checkUser->row()->user_name;
+                    $finalAr['user']['user_name'] = $checkUser->row()->user_name;
                     //Get payment method
                     $checkPayment = $this->app_model->get_selected_fields(PAYMENTS, array('ride_id' => $val['ride_id']), array('transactions'));
                     $finalAr['payment_method'] = $checkPayment->row()->transactions;
+
+                    $finalAr['begin_ride_time']=$val['ride_id'];/*$begin_time*/
 					$finalArr['trips'][]=$finalAr;
                     $i++;
                 }
@@ -3210,8 +3214,60 @@ class Drivers extends MY_Controller {
         $json_encode = json_encode($returnArr, JSON_PRETTY_PRINT);
         echo $this->cleanString($json_encode);
     }
-	
-	
+
+    public function provider_today_jobs()
+    {
+
+        $returnArr['status'] = '0';
+        $returnArr['response'] = '';
+
+        $driver_id = $this->input->post('driver_id');
+        $checkDriver = $this->app_model->get_selected_fields(DRIVERS, array('_id' => new \MongoId($driver_id)));
+        if ($checkDriver->num_rows() > 0) {
+            $checkRide = $this->app_model->get_selected_fields(RIDES, array('driver.id' => $driver_id));
+            if ($checkRide->num_rows() > 0) {
+                try {
+                    $ConnMongo = new MongoClient();
+                    $db = $ConnMongo->selectDB('mongoappconciinfo1');
+                    $collection = new MongoCollection($db, 'dectar_rides');
+                } catch (MongoConnectionException $e) {
+                    exit('START THE MONGO SERVER PLZ ...!!!');
+                }
+                $data = $collection->find(array('driver.id' => $driver_id));
+                foreach ($data as $id) {
+                    $dates[] = $id['history']['end_ride']->sec;
+                }
+                $maxdate = max($dates);
+                /*echo $maxdate;*/
+                foreach ($data as $id) {
+                    if ($id['history']['end_ride']->sec == $maxdate) {
+                        $provider_job = $id;
+                    }
+                }
+
+                //Get user information
+                $checkUser = $this->app_model->get_selected_fields(USERS, array('_id' => new \MongoId($provider_job['user']['id'])), array('image', 'user_name'));
+                if (isset($checkUser->row()->image)) {
+                    if ($checkUser->row()->image != '') {
+                        $userArr['user_image'] = USER_PROFILE_IMAGE . $checkUser->row()->image;
+                    }
+                }
+                $userArr['name'] = $checkUser->row()->user_name;
+                //Get payment method
+                $checkPayment = $this->app_model->get_selected_fields(PAYMENTS, array('ride_id' => $provider_job['ride_id']), array('transactions'));
+                $transactionsArr = $checkPayment->row()->transactions;
+                $returnArr['status'] = '1';
+                $returnArr['response'] = array('transaction_information' => $transactionsArr, 'user_information' => $userArr, 'provider__last_job' => $provider_job, 'message' => $this->format_string('You can see the latest job of your provider', 'success latest provider job'));
+            } else {
+                $returnArr['response'] = $this->format_string('Records not available', 'no_records_found');
+            }
+        } else {
+            $returnArr['response'] = $this->format_string('Invalid driver !', 'error_message_ride_invalid_driver');
+        }
+
+        $json_encode = json_encode($returnArr, JSON_PRETTY_PRINT);
+        echo $this->cleanString($json_encode);
+    }
 	    public function get_provider_reviews()
     {
         $returnArr['status'] = '0';
