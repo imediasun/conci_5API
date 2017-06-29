@@ -24,7 +24,7 @@ class Drivers extends MY_Controller {
 		if (array_key_exists("Authkey", $headers)) $auth_key = $headers['Authkey']; else $auth_key = "";
 		if(stripos($auth_key,APP_NAME) === false) {
 			$cf_fun= $this->router->fetch_method();
-			$apply_function = array('login_driver','update_driver_location','get_provider_reviews','provider_last_job','provider_last_job_summery','accept_ride','edit_driver_data','edit_provider_image','if_driver_onride');
+			$apply_function = array('login_driver','update_driver_location','get_provider_reviews','provider_last_job','provider_last_job_summery','accept_ride','edit_driver_data','edit_provider_image','if_driver_onride','continue_trip');
 			if(!in_array($cf_fun,$apply_function)){
 				show_404();
 			}
@@ -2771,7 +2771,7 @@ class Drivers extends MY_Controller {
             if ($driver_id != '' && $ride_id != '') {
                 $driverVal = $this->app_model->get_selected_fields(DRIVERS, array('_id' => new \MongoId($driver_id)), array('city', 'avail_category'));
                 if ($driverVal->num_rows() > 0) {
-                    $checkRide = $this->driver_model->get_selected_fields(RIDES, array('ride_id' => $ride_id), array('ride_id', 'ride_status', 'booking_information', 'user.id', 'location.id', 'coupon_used', 'coupon', 'est_pickup_date'));
+                    $checkRide = $this->driver_model->get_selected_fields(RIDES, array('ride_id' => $ride_id), array('ride_id', 'ride_status', 'booking_information', 'user.id', 'location.id', 'coupon_used', 'coupon', 'est_pickup_date','total.wait_time'));
                     if ($checkRide->num_rows() == 1) {
                         $iscontinue = 'NO';
                         if ($checkRide->row()->ride_status == 'Confirmed' || $checkRide->row()->ride_status == 'Arrived') {
@@ -2812,6 +2812,7 @@ class Drivers extends MY_Controller {
                                 'user_image' => base_url() . $user_image,
                                 'user_review' => floatval($user_review),
                                 'ride_id' => $ride_id,
+                                'wait_time'=>$checkRide->row()->total['wait_time'],
                                 'pickup_location' => $checkRide->row()->booking_information['pickup']['location'],
                                 'pickup_lat' => $checkRide->row()->booking_information['pickup']['latlong']['lat'],
                                 'pickup_lon' => $checkRide->row()->booking_information['pickup']['latlong']['lon'],
@@ -3162,11 +3163,13 @@ class Drivers extends MY_Controller {
                 $data = $collection->find(array('driver.id' => $driver_id));
                 $i=0;
                 foreach($data as $val){
+					
                     $begin_timestamp=$val['history']['begin_ride']->sec;
                     $begin_time= date('m/d/Y H:i:s', $begin_timestamp);
                     $end_timestamp=$val['history']['end_ride']->sec;
                     $end_time= date('m/d/Y H:i:s', $end_timestamp);
                     $finalArr[$i]['ride_total_time_min'] = (strtotime ($end_time)-strtotime ($begin_time))/60;
+					 $finalArr[$i]['pickup_date'] = date('m/d/Y H:i:s', $val['booking_information']['pickup_date']->sec);
                     $finalArr[$i]['ride_id'] = $val['ride_id'];
                     $finalArr[$i]['ride_status'] = $val['ride_status'];
                     //Get user information
@@ -3475,7 +3478,7 @@ class Drivers extends MY_Controller {
                     $driver_details = $this->app_model->get_selected_fields(DRIVERS, array('_id' => new MongoId($driver_id)), array('_id'));
                     if ($driver_details->num_rows() > 0) {
 
-                        $onride_details = $this->app_model->get_selected_fields(RIDES, array('driver.id' => $driver_id,'ride_status'=>'Onride'), array('ride_id'));
+                        $onride_details = $this->app_model->get_selected_fields(RIDES, array('driver.id' => $driver_id,'ride_status'=>'Onride','ride_status'=>'Confirmed'), array('ride_id'));
 
                         if($onride_details->num_rows() > 0){
 

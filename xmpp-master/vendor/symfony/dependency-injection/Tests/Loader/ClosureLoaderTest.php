@@ -11,14 +11,12 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 
-class ClosureLoaderTest extends \PHPUnit_Framework_TestCase
+class ClosureLoaderTest extends TestCase
 {
-    /**
-     * @covers Symfony\Component\DependencyInjection\Loader\ClosureLoader::supports
-     */
     public function testSupports()
     {
         $loader = new ClosureLoader(new ContainerBuilder());
@@ -27,9 +25,6 @@ class ClosureLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Loader\ClosureLoader::load
-     */
     public function testLoad()
     {
         $loader = new ClosureLoader($container = new ContainerBuilder());

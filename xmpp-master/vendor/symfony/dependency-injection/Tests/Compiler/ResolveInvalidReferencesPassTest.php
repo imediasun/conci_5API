@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInvalidReferencesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class ResolveInvalidReferencesPassTest extends \PHPUnit_Framework_TestCase
+class ResolveInvalidReferencesPassTest extends TestCase
 {
     public function testProcess()
     {
@@ -61,6 +62,9 @@ class ResolveInvalidReferencesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $def->getProperties());
     }
 
+    /**
+     * @group legacy
+     */
     public function testStrictFlagIsPreserved()
     {
         $container = new ContainerBuilder();

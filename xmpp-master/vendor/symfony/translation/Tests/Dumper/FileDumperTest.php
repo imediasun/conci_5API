@@ -11,11 +11,25 @@
 
 namespace Symfony\Component\Translation\Tests\Dumper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Dumper\FileDumper;
 
-class FileDumperTest extends \PHPUnit_Framework_TestCase
+class FileDumperTest extends TestCase
 {
+    public function testDump()
+    {
+        $tempDir = sys_get_temp_dir();
+
+        $catalogue = new MessageCatalogue('en');
+        $catalogue->add(array('foo' => 'bar'));
+
+        $dumper = new ConcreteFileDumper();
+        $dumper->dump($catalogue, array('path' => $tempDir));
+
+        $this->assertFileExists($tempDir.'/messages.en.concrete');
+    }
+
     public function testDumpBackupsFileIfExisting()
     {
         $tempDir = sys_get_temp_dir();
@@ -30,7 +44,7 @@ class FileDumperTest extends \PHPUnit_Framework_TestCase
         $dumper = new ConcreteFileDumper();
         $dumper->dump($catalogue, array('path' => $tempDir));
 
-        $this->assertTrue(file_exists($backupFile));
+        $this->assertFileExists($backupFile);
 
         @unlink($file);
         @unlink($backupFile);
@@ -49,7 +63,7 @@ class FileDumperTest extends \PHPUnit_Framework_TestCase
         $dumper->setRelativePathTemplate('test/translations/%domain%.%locale%.%extension%');
         $dumper->dump($catalogue, array('path' => $tempDir));
 
-        $this->assertTrue(file_exists($file));
+        $this->assertFileExists($file);
 
         @unlink($file);
         @rmdir($translationsDir);
@@ -58,7 +72,7 @@ class FileDumperTest extends \PHPUnit_Framework_TestCase
 
 class ConcreteFileDumper extends FileDumper
 {
-    protected function format(MessageCatalogue $messages, $domain)
+    public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
     {
         return '';
     }

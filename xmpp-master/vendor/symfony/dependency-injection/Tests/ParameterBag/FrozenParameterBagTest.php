@@ -11,13 +11,11 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
-class FrozenParameterBagTest extends \PHPUnit_Framework_TestCase
+class FrozenParameterBagTest extends TestCase
 {
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag::__construct
-     */
     public function testConstructor()
     {
         $parameters = array(
@@ -29,7 +27,6 @@ class FrozenParameterBagTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag::clear
      * @expectedException \LogicException
      */
     public function testClear()
@@ -39,7 +36,6 @@ class FrozenParameterBagTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag::set
      * @expectedException \LogicException
      */
     public function testSet()
@@ -49,7 +45,6 @@ class FrozenParameterBagTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag::add
      * @expectedException \LogicException
      */
     public function testAdd()

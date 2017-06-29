@@ -457,7 +457,7 @@ class Profile extends MY_Controller {
 
 
         $dataArr = array_merge($driver_data, $image_data, $addressArr, array('documents' => $documents));  #echo '<pre>'; print_r($dataArr); die;
-
+		var_dump($dataArr);die;
         $condition = array();
         $this->driver_model->commonInsertUpdate(DRIVERS, 'insert', $excludeArr, $dataArr, $condition);
         $last_insert_id = $this->cimongo->insert_id();

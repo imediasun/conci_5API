@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\FormatterHelper;
 
-class FormatterHelperTest extends \PHPUnit_Framework_TestCase
+class FormatterHelperTest extends TestCase
 {
     public function testFormatSection()
     {
@@ -52,9 +53,6 @@ class FormatterHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @requires extension mbstring
-     */
     public function testFormatBlockWithDiacriticLetters()
     {
         $formatter = new FormatterHelper();
@@ -68,9 +66,6 @@ class FormatterHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @requires extension mbstring
-     */
     public function testFormatBlockWithDoubleWidthDiacriticLetters()
     {
         $formatter = new FormatterHelper();

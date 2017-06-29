@@ -586,6 +586,7 @@ class User extends MY_Controller {
      *
      * */
     public function track_driver_location() {
+		
         $ride_id = $this->input->post('ride_id');
         if ($ride_id == '') {
             $ride_id = $this->input->get('ride_id');
@@ -617,8 +618,10 @@ class User extends MY_Controller {
 					}
 
 
-                    $checkDriver = $this->app_model->get_selected_fields(DRIVERS, array('_id' => new \MongoId($driver_id)), array('_id', 'driver_name', 'image', 'avg_review', 'email', 'dail_code', 'mobile_number', 'vehicle_number', 'vehicle_model'));
-                    /* Preparing driver information to share with user -- Start */
+                    $checkDriver = $this->app_model->get_selected_fields(DRIVERS, array('_id' => new \MongoId($driver_id)), array('_id', 'driver_name', 'image', 'avg_review', 'email', 'dail_code', 'mobile_number', 'vehicle_number', 'vehicle_model','languages','type_of_service'));
+                    
+					
+					/* Preparing driver information to share with user -- Start */
                     $driver_image = USER_PROFILE_IMAGE_DEFAULT;
                     if (isset($checkDriver->row()->image)) {
                         if ($checkDriver->row()->image != '') {
@@ -652,8 +655,20 @@ class User extends MY_Controller {
 						$drop_arr = json_decode("{}");
 					}
 
-
-                    $driver_profile = array('driver_id' => (string) $checkDriver->row()->_id,
+					//get type of service
+					
+					/* $type_of_service = $this->app_model->get_selected_fields(VEHICLES, array('_id' => new \MongoId($checkDriver->row()->type_of_service)), array('vehicle_type')); */
+                    
+					if($checkDriver->row()->languages===null){
+					$languages="";	
+					}
+					else{
+					$languages=$checkDriver->row()->languages;	
+					}
+					
+					
+					$type_of_service = $type_of_service->row()->vehicle_type===null ? "silver" : $type_of_service->row()->vehicle_type; //????
+					$driver_profile = array('driver_id' => (string) $checkDriver->row()->_id,
                         'driver_name' => (string) $checkDriver->row()->driver_name,
                         'driver_email' => (string) $checkDriver->row()->email,
                         'driver_image' => (string) base_url() . $driver_image,
@@ -667,7 +682,8 @@ class User extends MY_Controller {
                         'phone_number' => (string) $checkDriver->row()->dail_code . $checkDriver->row()->mobile_number,
                         'vehicle_number' => (string) $checkDriver->row()->vehicle_number,
                         'vehicle_model' => (string) $vehicle_model,
-                        //'driver_language'=> $checkDriver->row()->languages,
+						'type-of-service' => $type_of_service,
+                        'driver_languages'=> $languages,
                         'ride_status' => (string) $checkRide->row()->ride_status,
                         'pickup' => $pickup_arr,
                         'drop' => $drop_arr

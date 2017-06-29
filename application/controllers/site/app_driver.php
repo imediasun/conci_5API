@@ -208,6 +208,7 @@ class App_driver extends MY_Controller {
 
         /*$driver_id = $this->input->post('driver_id');
         */
+		
         $dir = getcwd() . "/drivers_documents_temp"; //dir absolute path
         $interval = strtotime('-24 hours'); //files older than 24hours
         foreach (glob($dir . "*.*") as $file) {
@@ -244,7 +245,7 @@ class App_driver extends MY_Controller {
             $ac = 'No';
         }
 
-        $excludeArr = array("confirm_password", "new_password", "address", "county", "state", "city", "postal_code", "driver_docx", "driver_docx_expiry", "vehicle_docx", "vehicle_docx_expiry", "vehicle_type", "mobile_number", "dail_code", "aircond", "termsCondition", "email");
+        $excludeArr = array("confirm_password", "new_password", "address", "county", "state", "city", "postal_code", "driver_docx", "driver_docx_expiry", "vehicle_docx", "vehicle_docx_expiry", "vehicle_type", "mobile_number", "dail_code", "aircond", "termsCondition", "email",'select_language1','select_language2','select_language3','select_language4');
 
         $addressArr['address'] = array('address' => $this->input->post('address'),
             'county' => $this->input->post('county'),
@@ -342,16 +343,16 @@ class App_driver extends MY_Controller {
             'category' => new \MongoId($this->input->post('category')),
 			'verify_status' => 'No'
         );
-   /*     $lang[0]=$this->input->post('select-language1');
+    $lang[0]=$this->input->post('select-language1');
         $lang[1]=$this->input->post('select-language2');
         $lang[2]=$this->input->post('select-language3');
         $lang[4]=$this->input->post('select-language4');
         $result_lang = array_unique($lang);
 
         foreach($result_lang as $lang){
-            $result_lang['vehicle_number'][]=$lang;
+            $result_lang['languages'][]=$lang;
 
-        }*/
+        }
 
 
          if($this->input->post('driver_commission') == ''){
@@ -363,10 +364,11 @@ class App_driver extends MY_Controller {
 		}
 
 
-        $dataArr = array_merge($driver_data, /*$image_data,*/ $addressArr/*array('documents' => $documents)*//*,$result_lang*/);
+        $dataArr = array_merge($driver_data, /*$image_data,*/ $addressArr/*array('documents' => $documents)*/,$result_lang);
 
         $condition = array();
         $this->driver_model->commonInsertUpdate(DRIVERS, 'insert', $excludeArr, $dataArr, $condition);
+		
         $last_insert_id = $this->cimongo->insert_id();
 
         $fields = array(
@@ -376,6 +378,7 @@ class App_driver extends MY_Controller {
         $url = $this->data['soc_url'] . 'create-user.php';
         $this->load->library('curl');
         $output = $this->curl->simple_post($url, $fields);
+		
 
         /* Update Stats Starts */
         $current_date = new \MongoDate(strtotime(date("Y-m-d 00:00:00")));

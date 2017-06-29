@@ -154,7 +154,8 @@ class App_model extends My_Model {
                     'total_review' => 1,
                     'distance' => 1,
                     'verify_status' => 1,
-                    'last_active_time' => 1
+                    'last_active_time' => 1,
+					'image' => 1
                 )
             ),
             array(

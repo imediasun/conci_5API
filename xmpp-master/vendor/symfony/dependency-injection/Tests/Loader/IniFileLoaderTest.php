@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\Config\FileLocator;
 
-class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
+class IniFileLoaderTest extends TestCase
 {
     protected static $fixturesPath;
 
@@ -33,10 +34,6 @@ class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->loader = new IniFileLoader($this->container, new FileLocator(self::$fixturesPath.'/ini'));
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Loader\IniFileLoader::__construct
-     * @covers Symfony\Component\DependencyInjection\Loader\IniFileLoader::load
-     */
     public function testIniFileCanBeLoaded()
     {
         $this->loader->load('parameters.ini');
@@ -44,9 +41,6 @@ class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\Loader\IniFileLoader::__construct
-     * @covers Symfony\Component\DependencyInjection\Loader\IniFileLoader::load
-     *
      * @expectedException        \InvalidArgumentException
      * @expectedExceptionMessage The file "foo.ini" does not exist (in:
      */
@@ -56,9 +50,6 @@ class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\Loader\IniFileLoader::__construct
-     * @covers Symfony\Component\DependencyInjection\Loader\IniFileLoader::load
-     *
      * @expectedException        \InvalidArgumentException
      * @expectedExceptionMessage The "nonvalid.ini" file is not valid.
      */
@@ -67,9 +58,6 @@ class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
         @$this->loader->load('nonvalid.ini');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Loader\IniFileLoader::supports
-     */
     public function testSupports()
     {
         $loader = new IniFileLoader(new ContainerBuilder(), new FileLocator());

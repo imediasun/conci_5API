@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Translation\Tests\DataCollector;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\DataCollectorTranslator;
 use Symfony\Component\Translation\DataCollector\TranslationDataCollector;
 
-class TranslationDataCollectorTest extends \PHPUnit_Framework_TestCase
+class TranslationDataCollectorTest extends TestCase
 {
     protected function setUp()
     {
@@ -46,6 +47,8 @@ class TranslationDataCollectorTest extends \PHPUnit_Framework_TestCase
                   'locale' => 'en',
                   'domain' => 'messages',
                   'state' => DataCollectorTranslator::MESSAGE_DEFINED,
+                  'parameters' => array(),
+                  'transChoiceNumber' => null,
             ),
             array(
                   'id' => 'bar',
@@ -53,6 +56,8 @@ class TranslationDataCollectorTest extends \PHPUnit_Framework_TestCase
                   'locale' => 'fr',
                   'domain' => 'messages',
                   'state' => DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK,
+                  'parameters' => array(),
+                  'transChoiceNumber' => null,
             ),
             array(
                   'id' => 'choice',
@@ -60,6 +65,8 @@ class TranslationDataCollectorTest extends \PHPUnit_Framework_TestCase
                   'locale' => 'en',
                   'domain' => 'messages',
                   'state' => DataCollectorTranslator::MESSAGE_MISSING,
+                  'parameters' => array('%count%' => 3),
+                  'transChoiceNumber' => 3,
             ),
             array(
                   'id' => 'choice',
@@ -67,6 +74,17 @@ class TranslationDataCollectorTest extends \PHPUnit_Framework_TestCase
                   'locale' => 'en',
                   'domain' => 'messages',
                   'state' => DataCollectorTranslator::MESSAGE_MISSING,
+                  'parameters' => array('%count%' => 3),
+                  'transChoiceNumber' => 3,
+            ),
+            array(
+                  'id' => 'choice',
+                  'translation' => 'choice',
+                  'locale' => 'en',
+                  'domain' => 'messages',
+                  'state' => DataCollectorTranslator::MESSAGE_MISSING,
+                  'parameters' => array('%count%' => 4, '%foo%' => 'bar'),
+                  'transChoiceNumber' => 4,
             ),
         );
         $expectedMessages = array(
@@ -77,6 +95,8 @@ class TranslationDataCollectorTest extends \PHPUnit_Framework_TestCase
                   'domain' => 'messages',
                   'state' => DataCollectorTranslator::MESSAGE_DEFINED,
                   'count' => 1,
+                  'parameters' => array(),
+                  'transChoiceNumber' => null,
             ),
             array(
                   'id' => 'bar',
@@ -85,6 +105,8 @@ class TranslationDataCollectorTest extends \PHPUnit_Framework_TestCase
                   'domain' => 'messages',
                   'state' => DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK,
                   'count' => 1,
+                  'parameters' => array(),
+                  'transChoiceNumber' => null,
             ),
             array(
                   'id' => 'choice',
@@ -92,7 +114,13 @@ class TranslationDataCollectorTest extends \PHPUnit_Framework_TestCase
                   'locale' => 'en',
                   'domain' => 'messages',
                   'state' => DataCollectorTranslator::MESSAGE_MISSING,
-                  'count' => 2,
+                  'count' => 3,
+                  'parameters' => array(
+                      array('%count%' => 3),
+                      array('%count%' => 3),
+                      array('%count%' => 4, '%foo%' => 'bar'),
+                  ),
+                  'transChoiceNumber' => 3,
             ),
         );
 

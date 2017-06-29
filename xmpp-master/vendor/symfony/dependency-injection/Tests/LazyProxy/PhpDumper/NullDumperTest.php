@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\LazyProxy\PhpDumper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 
@@ -18,10 +19,8 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
  * Tests for {@see \Symfony\Component\DependencyInjection\PhpDumper\NullDumper}.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
- *
- * @covers \Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper
  */
-class NullDumperTest extends \PHPUnit_Framework_TestCase
+class NullDumperTest extends TestCase
 {
     public function testNullDumper()
     {

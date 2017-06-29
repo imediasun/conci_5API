@@ -11,16 +11,14 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
-class ParameterBagTest extends \PHPUnit_Framework_TestCase
+class ParameterBagTest extends TestCase
 {
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::__construct
-     */
     public function testConstructor()
     {
         $bag = new ParameterBag($parameters = array(
@@ -30,9 +28,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($parameters, $bag->all(), '__construct() takes an array of parameters as its first argument');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::clear
-     */
     public function testClear()
     {
         $bag = new ParameterBag($parameters = array(
@@ -43,9 +38,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $bag->all(), '->clear() removes all parameters');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::remove
-     */
     public function testRemove()
     {
         $bag = new ParameterBag(array(
@@ -58,10 +50,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $bag->all(), '->remove() converts key to lowercase before removing');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::get
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::set
-     */
     public function testGetSet()
     {
         $bag = new ParameterBag(array('foo' => 'bar'));
@@ -117,9 +105,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::has
-     */
     public function testHas()
     {
         $bag = new ParameterBag(array('foo' => 'bar'));
@@ -128,9 +113,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($bag->has('bar'), '->has() returns false if a parameter is not defined');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::resolveValue
-     */
     public function testResolveValue()
     {
         $bag = new ParameterBag(array());
@@ -198,9 +180,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo.bar:1337', $bag->resolveValue('%host%:%port%'));
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::resolve
-     */
     public function testResolveIndicatesWhyAParameterIsNeeded()
     {
         $bag = new ParameterBag(array('foo' => '%bar%'));
@@ -220,9 +199,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::resolve
-     */
     public function testResolveUnescapesValue()
     {
         $bag = new ParameterBag(array(
@@ -236,9 +212,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('bar' => array('ding' => 'I\'m a bar %foo %bar')), $bag->get('foo'), '->resolveValue() supports % escaping by doubling it');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::escapeValue
-     */
     public function testEscapeValue()
     {
         $bag = new ParameterBag();
@@ -253,7 +226,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::resolve
      * @dataProvider stringsWithSpacesProvider
      */
     public function testResolveStringWithSpacesReturnsString($expected, $test, $description)

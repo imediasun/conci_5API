@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 
-class DecoratorServicePassTest extends \PHPUnit_Framework_TestCase
+class DecoratorServicePassTest extends TestCase
 {
     public function testProcessWithoutAlias()
     {
@@ -80,6 +81,88 @@ class DecoratorServicePassTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($container->getAlias('foo.extended.inner')->isPublic());
 
         $this->assertNull($fooExtendedDefinition->getDecoratedService());
+    }
+
+    public function testProcessWithPriority()
+    {
+        $container = new ContainerBuilder();
+        $fooDefinition = $container
+            ->register('foo')
+            ->setPublic(false)
+        ;
+        $barDefinition = $container
+            ->register('bar')
+            ->setPublic(true)
+            ->setDecoratedService('foo')
+        ;
+        $bazDefinition = $container
+            ->register('baz')
+            ->setPublic(true)
+            ->setDecoratedService('foo', null, 5)
+        ;
+        $quxDefinition = $container
+            ->register('qux')
+            ->setPublic(true)
+            ->setDecoratedService('foo', null, 3)
+        ;
+
+        $this->process($container);
+
+        $this->assertEquals('bar', $container->getAlias('foo'));
+        $this->assertFalse($container->getAlias('foo')->isPublic());
+
+        $this->assertSame($fooDefinition, $container->getDefinition('baz.inner'));
+        $this->assertFalse($container->getDefinition('baz.inner')->isPublic());
+
+        $this->assertEquals('qux', $container->getAlias('bar.inner'));
+        $this->assertFalse($container->getAlias('bar.inner')->isPublic());
+
+        $this->assertEquals('baz', $container->getAlias('qux.inner'));
+        $this->assertFalse($container->getAlias('qux.inner')->isPublic());
+
+        $this->assertNull($barDefinition->getDecoratedService());
+        $this->assertNull($bazDefinition->getDecoratedService());
+        $this->assertNull($quxDefinition->getDecoratedService());
+    }
+
+    public function testProcessMovesTagsFromDecoratedDefinitionToDecoratingDefinition()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo')
+            ->setTags(array('bar' => array('attr' => 'baz')))
+        ;
+        $container
+            ->register('baz')
+            ->setTags(array('foobar' => array('attr' => 'bar')))
+            ->setDecoratedService('foo')
+        ;
+
+        $this->process($container);
+
+        $this->assertEmpty($container->getDefinition('baz.inner')->getTags());
+        $this->assertEquals(array('bar' => array('attr' => 'baz'), 'foobar' => array('attr' => 'bar')), $container->getDefinition('baz')->getTags());
+    }
+
+    public function testProcessMergesAutowiringTypesInDecoratingDefinitionAndRemoveThemFromDecoratedDefinition()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('parent')
+            ->addAutowiringType('Bar')
+        ;
+
+        $container
+            ->register('child')
+            ->setDecoratedService('parent')
+            ->addAutowiringType('Foo')
+        ;
+
+        $this->process($container);
+
+        $this->assertEquals(array('Bar', 'Foo'), $container->getDefinition('child')->getAutowiringTypes());
+        $this->assertEmpty($container->getDefinition('child.inner')->getAutowiringTypes());
     }
 
     protected function process(ContainerBuilder $container)

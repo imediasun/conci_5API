@@ -19,7 +19,7 @@ $logger = new Logger('xmpp');
 $logger->pushHandler(new StreamHandler(dirname(__FILE__).'/log.txt', Logger::DEBUG));
 $hostname       = vhost_name;
 $port           = 5222;
-$connectionType = 'tcp';
+$connectionType = 'tcp';/*tcp*/
 $address        = "$connectionType://$hostname:$port";
 $username = vhost_admin_name;
 $password = vhost_admin_password;

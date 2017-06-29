@@ -10,6 +10,6 @@ define('database_user','appcofodbuser');	// MySQL user Name
 define('database_password','sjreg093jtgasdf');	// MySQL Password
 
 define('vhost','localhost');	// Xmpp Host/IP
-define('vhost_name','app.conci.info');	// Xmpp Service Name
+define('vhost_name','app.conci.info');	// Xmpp Service Name         app.conci.info
 define('vhost_admin_name','admin');	// Xmpp Admin User Name (without service name)
-define('vhost_admin_password','6dfghe25rerg5');	// Xmpp Admin Password
+define('vhost_admin_password','6dfghe25rerg5');	// Xmpp Admin Password 6dfghe25rerg5

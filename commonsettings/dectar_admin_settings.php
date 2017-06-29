@@ -70,5 +70,5 @@ $config['ios_user_dev'] = '091be6ef69ea9db24c1a0b06b345bf8f.pem';
 $config['ios_driver_dev'] = '7f1e03591013a4fccab201bc39df67b3.pem'; 
 $config['ios_driver_prod'] = '6054fb180af8d1f46441e2435bff7843.pem'; 
 $config['ios_user_prod'] = 'af328d0c014a9559366cf3a85b40edba.pem'; 
-$config['base_url'] = 'http://conci.imedia.in.ua/';
+$config['base_url'] = 'http://pro.conci.info/';
   ?>

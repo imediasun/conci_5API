@@ -26,7 +26,7 @@ class User extends MY_Controller {
 		if (array_key_exists("Authkey", $headers)) $auth_key = $headers['Authkey']; else $auth_key = "";
 		if(stripos($auth_key,APP_NAME) === false) {
 			$cf_fun= $this->router->fetch_method();
-			$apply_function = array('check_account','check_social_login','register_user','social_Login','login_user','proceed_payment','booking_ride');
+			$apply_function = array('check_account','check_social_login','register_user','social_Login','login_user','proceed_payment','booking_ride','get_drivers_in_map');
 			if(!in_array($cf_fun,$apply_function)){
 				show_404();
 			}
@@ -1577,19 +1577,25 @@ class User extends MY_Controller {
                                             'text' => $ride_time_rate_post . ' ' . $location['result'][0]['fare'][$category]['min_time'] . ' ' . $min_time_unit);
                                     }
                                 }
+								
+								$fare['maxPerson']="";
+								
                                 $rateCard['farebreakup'] = $fare;
                             }
                         }
 
                         $driverList = $this->app_model->get_nearest_driver($coordinates, $category, $limit);
+						
                         $driversArr = array();
                         if (!empty($driverList['result'])) {
                             foreach ($driverList['result'] as $driver) {
+								
                                 $lat = $driver['loc']['lat'];
                                 $lon = $driver['loc']['lon'];
                                 $driversArr[] = array('lat' => $lat,
-                                    'lon' => $lon
+                                    'lon' => $lon,'image' => USER_PROFILE_IMAGE .$driver['image']
                                 );
+								
                             }
                         }
                         $returnArr['status'] = '1';
