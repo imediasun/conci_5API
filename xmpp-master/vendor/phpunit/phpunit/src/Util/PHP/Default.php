@@ -30,14 +30,9 @@ class PHPUnit_Util_PHP_Default extends PHPUnit_Util_PHP
     public function runJob($job, array $settings = array())
     {
         $runtime = new Runtime;
-        $runtime = $runtime->getBinary() . $this->settingsToParameters($settings);
-
-        if ('phpdbg' === PHP_SAPI) {
-            $runtime .= ' -qrr ' . escapeshellarg(__DIR__ . '/eval-stdin.php');
-        }
 
         $process = proc_open(
-            $runtime,
+            $runtime->getBinary() . $this->settingsToParameters($settings),
             array(
             0 => array('pipe', 'r'),
             1 => array('pipe', 'w'),

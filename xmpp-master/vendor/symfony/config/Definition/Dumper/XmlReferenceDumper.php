@@ -84,17 +84,13 @@ class XmlReferenceDumper
 
             // render prototyped nodes
             if ($node instanceof PrototypedArrayNode) {
-                $prototype = $node->getPrototype();
-
-                $info = 'prototype';
-                if (null !== $prototype->getInfo()) {
-                    $info .= ': '.$prototype->getInfo();
-                }
-                array_unshift($rootComments, $info);
+                array_unshift($rootComments, 'prototype');
 
                 if ($key = $node->getKeyAttribute()) {
                     $rootAttributes[$key] = str_replace('-', ' ', $rootName).' '.$key;
                 }
+
+                $prototype = $node->getPrototype();
 
                 if ($prototype instanceof ArrayNode) {
                     $children = $prototype->getChildren();

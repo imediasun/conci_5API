@@ -11,15 +11,17 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @group legacy
  */
-class LegacyContainerBuilderTest extends TestCase
+class LegacyContainerBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
+     */
     public function testCreateServiceFactoryMethod()
     {
         $builder = new ContainerBuilder();
@@ -30,6 +32,9 @@ class LegacyContainerBuilderTest extends TestCase
         $this->assertEquals(array('foo' => 'bar', 'bar' => 'foo', $builder->get('bar')), $builder->get('foo1')->arguments, '->createService() passes the arguments to the factory method');
     }
 
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
+     */
     public function testCreateServiceFactoryService()
     {
         $builder = new ContainerBuilder();

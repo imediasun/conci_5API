@@ -11,11 +11,10 @@
 
 namespace Symfony\Component\Yaml\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Dumper;
 
-class DumperTest extends TestCase
+class DumperTest extends \PHPUnit_Framework_TestCase
 {
     protected $parser;
     protected $dumper;
@@ -55,7 +54,7 @@ class DumperTest extends TestCase
     {
         $this->dumper->setIndentation(7);
 
-        $expected = <<<'EOF'
+        $expected = <<<EOF
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -104,13 +103,13 @@ EOF;
 
     public function testInlineLevel()
     {
-        $expected = <<<'EOF'
+        $expected = <<<EOF
 { '': bar, foo: '#bar', 'foo''bar': {  }, bar: [1, foo], foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } } }
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, -10), '->dump() takes an inline level argument');
         $this->assertEquals($expected, $this->dumper->dump($this->array, 0), '->dump() takes an inline level argument');
 
-        $expected = <<<'EOF'
+        $expected = <<<EOF
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -120,7 +119,7 @@ foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } }
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, 1), '->dump() takes an inline level argument');
 
-        $expected = <<<'EOF'
+        $expected = <<<EOF
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -135,7 +134,7 @@ foobar:
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, 2), '->dump() takes an inline level argument');
 
-        $expected = <<<'EOF'
+        $expected = <<<EOF
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -154,7 +153,7 @@ foobar:
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, 3), '->dump() takes an inline level argument');
 
-        $expected = <<<'EOF'
+        $expected = <<<EOF
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -181,7 +180,7 @@ EOF;
     {
         $dump = $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, false, true);
 
-        $this->assertEquals('{ foo: !php/object:O:30:"Symfony\Component\Yaml\Tests\A":1:{s:1:"a";s:3:"foo";}, bar: 1 }', $dump, '->dump() is able to dump objects');
+        $this->assertEquals('{ foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\A":1:{s:1:"a";s:3:"foo";}, bar: 1 }', $dump, '->dump() is able to dump objects');
     }
 
     public function testObjectSupportDisabledButNoExceptions()
@@ -210,44 +209,24 @@ EOF;
     public function getEscapeSequences()
     {
         return array(
-            'empty string' => array('', "''"),
-            'null' => array("\x0", '"\\0"'),
-            'bell' => array("\x7", '"\\a"'),
-            'backspace' => array("\x8", '"\\b"'),
-            'horizontal-tab' => array("\t", '"\\t"'),
-            'line-feed' => array("\n", '"\\n"'),
-            'vertical-tab' => array("\v", '"\\v"'),
-            'form-feed' => array("\xC", '"\\f"'),
-            'carriage-return' => array("\r", '"\\r"'),
-            'escape' => array("\x1B", '"\\e"'),
-            'space' => array(' ', "' '"),
-            'double-quote' => array('"', "'\"'"),
-            'slash' => array('/', '/'),
-            'backslash' => array('\\', '\\'),
-            'next-line' => array("\xC2\x85", '"\\N"'),
-            'non-breaking-space' => array("\xc2\xa0", '"\\_"'),
-            'line-separator' => array("\xE2\x80\xA8", '"\\L"'),
-            'paragraph-separator' => array("\xE2\x80\xA9", '"\\P"'),
-            'colon' => array(':', "':'"),
+            'null' => array("\t\\0", '"\t\\\\0"'),
+            'bell' => array("\t\\a", '"\t\\\\a"'),
+            'backspace' => array("\t\\b", '"\t\\\\b"'),
+            'horizontal-tab' => array("\t\\t", '"\t\\\\t"'),
+            'line-feed' => array("\t\\n", '"\t\\\\n"'),
+            'vertical-tab' => array("\t\\v", '"\t\\\\v"'),
+            'form-feed' => array("\t\\f", '"\t\\\\f"'),
+            'carriage-return' => array("\t\\r", '"\t\\\\r"'),
+            'escape' => array("\t\\e", '"\t\\\\e"'),
+            'space' => array("\t\\ ", '"\t\\\\ "'),
+            'double-quote' => array("\t\\\"", '"\t\\\\\\""'),
+            'slash' => array("\t\\/", '"\t\\\\/"'),
+            'backslash' => array("\t\\\\", '"\t\\\\\\\\"'),
+            'next-line' => array("\t\\N", '"\t\\\\N"'),
+            'non-breaking-space' => array("\t\\�", '"\t\\\\�"'),
+            'line-separator' => array("\t\\L", '"\t\\\\L"'),
+            'paragraph-separator' => array("\t\\P", '"\t\\\\P"'),
         );
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The indentation must be greater than zero
-     */
-    public function testZeroIndentationThrowsException()
-    {
-        $this->dumper->setIndentation(0);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The indentation must be greater than zero
-     */
-    public function testNegativeIndentationThrowsException()
-    {
-        $this->dumper->setIndentation(-4);
     }
 }
 

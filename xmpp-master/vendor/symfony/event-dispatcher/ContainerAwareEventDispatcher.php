@@ -105,7 +105,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     public function hasListeners($eventName = null)
     {
         if (null === $eventName) {
-            return $this->listenerIds || $this->listeners || parent::hasListeners();
+            return (bool) count($this->listenerIds) || (bool) count($this->listeners);
         }
 
         if (isset($this->listenerIds[$eventName])) {
@@ -129,16 +129,6 @@ class ContainerAwareEventDispatcher extends EventDispatcher
         }
 
         return parent::getListeners($eventName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getListenerPriority($eventName, $listener)
-    {
-        $this->lazyLoad($eventName);
-
-        return parent::getListenerPriority($eventName, $listener);
     }
 
     /**

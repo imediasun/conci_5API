@@ -11,16 +11,15 @@
 
 namespace Symfony\Component\Config\Tests\Resource;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\DirectoryResource;
 
-class DirectoryResourceTest extends TestCase
+class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
 {
     protected $directory;
 
     protected function setUp()
     {
-        $this->directory = sys_get_temp_dir().DIRECTORY_SEPARATOR.'symfonyDirectoryIterator';
+        $this->directory = sys_get_temp_dir().'/symfonyDirectoryIterator';
         if (!file_exists($this->directory)) {
             mkdir($this->directory);
         }
@@ -97,10 +96,8 @@ class DirectoryResourceTest extends TestCase
     public function testIsFreshDeleteFile()
     {
         $resource = new DirectoryResource($this->directory);
-        $time = time();
-        sleep(1);
         unlink($this->directory.'/tmp.xml');
-        $this->assertFalse($resource->isFresh($time), '->isFresh() returns false if an existing file is removed');
+        $this->assertFalse($resource->isFresh(time()), '->isFresh() returns false if an existing file is removed');
     }
 
     public function testIsFreshDeleteDirectory()

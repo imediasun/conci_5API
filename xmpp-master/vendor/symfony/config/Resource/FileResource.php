@@ -18,7 +18,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FileResource implements SelfCheckingResourceInterface, \Serializable
+class FileResource implements ResourceInterface, \Serializable
 {
     /**
      * @var string|false
@@ -32,7 +32,7 @@ class FileResource implements SelfCheckingResourceInterface, \Serializable
      */
     public function __construct($resource)
     {
-        $this->resource = realpath($resource) ?: (file_exists($resource) ? $resource : false);
+        $this->resource = realpath($resource);
     }
 
     /**

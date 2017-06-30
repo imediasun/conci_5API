@@ -12,11 +12,8 @@
 namespace Symfony\Component\Config;
 
 /**
- * Basic implementation of ConfigCacheFactoryInterface that
- * creates an instance of the default ConfigCache.
- *
- * This factory and/or cache <em>do not</em> support cache validation
- * by means of ResourceChecker instances (that is, service-based).
+ * Basic implementation for ConfigCacheFactoryInterface
+ * that will simply create an instance of ConfigCache.
  *
  * @author Matthias Pigulla <mp@webfactory.de>
  */

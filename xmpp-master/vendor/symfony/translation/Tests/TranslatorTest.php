@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Translation\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\MessageCatalogue;
 
-class TranslatorTest extends TestCase
+class TranslatorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider      getInvalidLocalesTests
@@ -156,7 +155,6 @@ class TranslatorTest extends TestCase
         $translator = new Translator($locale, new MessageSelector());
         $translator->setFallbackLocales(array('fr', $locale));
         // no assertion. this method just asserts that no exception is thrown
-        $this->addToAssertionCount(1);
     }
 
     public function testTransWithFallbackLocale()
@@ -188,7 +186,6 @@ class TranslatorTest extends TestCase
         $translator = new Translator('fr', new MessageSelector());
         $translator->addResource('array', array('foo' => 'foofoo'), $locale);
         // no assertion. this method just asserts that no exception is thrown
-        $this->addToAssertionCount(1);
     }
 
     public function testAddResourceAfterTrans()
@@ -274,36 +271,6 @@ class TranslatorTest extends TestCase
         $translator->addResource('array', array('foo' => 'foofoo'), 'en');
 
         $translator->trans('foo');
-    }
-
-    public function testNestedFallbackCatalogueWhenUsingMultipleLocales()
-    {
-        $translator = new Translator('fr');
-        $translator->setFallbackLocales(array('ru', 'en'));
-
-        $translator->getCatalogue('fr');
-
-        $this->assertNotNull($translator->getCatalogue('ru')->getFallbackCatalogue());
-    }
-
-    public function testFallbackCatalogueResources()
-    {
-        $translator = new Translator('en_GB', new MessageSelector());
-        $translator->addLoader('yml', new \Symfony\Component\Translation\Loader\YamlFileLoader());
-        $translator->addResource('yml', __DIR__.'/fixtures/empty.yml', 'en_GB');
-        $translator->addResource('yml', __DIR__.'/fixtures/resources.yml', 'en');
-
-        // force catalogue loading
-        $this->assertEquals('bar', $translator->trans('foo', array()));
-
-        $resources = $translator->getCatalogue('en')->getResources();
-        $this->assertCount(1, $resources);
-        $this->assertContains(__DIR__.DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'resources.yml', $resources);
-
-        $resources = $translator->getCatalogue('en_GB')->getResources();
-        $this->assertCount(2, $resources);
-        $this->assertContains(__DIR__.DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'empty.yml', $resources);
-        $this->assertContains(__DIR__.DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'resources.yml', $resources);
     }
 
     /**
@@ -392,7 +359,6 @@ class TranslatorTest extends TestCase
 
         $translator->transChoice('foo', 1, array(), '', $locale);
         // no assertion. this method just asserts that no exception is thrown
-        $this->addToAssertionCount(1);
     }
 
     public function getTransFileTests()
@@ -531,10 +497,9 @@ class TranslatorTest extends TestCase
     }
 
     /**
-     * @group legacy
      * @dataProvider dataProviderGetMessages
      */
-    public function testLegacyGetMessages($resources, $locale, $expected)
+    public function testGetMessages($resources, $locale, $expected)
     {
         $locales = array_keys($resources);
         $_locale = null !== $locale ? $locale : reset($locales);

@@ -11,11 +11,10 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 
-class CrossCheckTest extends TestCase
+class CrossCheckTest extends \PHPUnit_Framework_TestCase
 {
     protected static $fixturesPath;
 
@@ -35,9 +34,9 @@ class CrossCheckTest extends TestCase
         $loaderClass = 'Symfony\\Component\\DependencyInjection\\Loader\\'.ucfirst($type).'FileLoader';
         $dumperClass = 'Symfony\\Component\\DependencyInjection\\Dumper\\'.ucfirst($type).'Dumper';
 
-        $tmp = tempnam(sys_get_temp_dir(), 'sf');
+        $tmp = tempnam('sf_service_container', 'sf');
 
-        copy(self::$fixturesPath.'/'.$type.'/'.$fixture, $tmp);
+        file_put_contents($tmp, file_get_contents(self::$fixturesPath.'/'.$type.'/'.$fixture));
 
         $container1 = new ContainerBuilder();
         $loader1 = new $loaderClass($container1, new FileLocator());
@@ -74,17 +73,24 @@ class CrossCheckTest extends TestCase
 
     public function crossCheckLoadersDumpers()
     {
-        return array(
+        $tests = array(
             array('services1.xml', 'xml'),
             array('services2.xml', 'xml'),
             array('services6.xml', 'xml'),
             array('services8.xml', 'xml'),
             array('services9.xml', 'xml'),
-            array('services1.yml', 'yaml'),
-            array('services2.yml', 'yaml'),
-            array('services6.yml', 'yaml'),
-            array('services8.yml', 'yaml'),
-            array('services9.yml', 'yaml'),
         );
+
+        if (class_exists('Symfony\Component\Yaml\Yaml')) {
+            $tests = array_merge($tests, array(
+                array('services1.yml', 'yaml'),
+                array('services2.yml', 'yaml'),
+                array('services6.yml', 'yaml'),
+                array('services8.yml', 'yaml'),
+                array('services9.yml', 'yaml'),
+            ));
+        }
+
+        return $tests;
     }
 }

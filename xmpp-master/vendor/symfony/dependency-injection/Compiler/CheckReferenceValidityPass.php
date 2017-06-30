@@ -46,10 +46,10 @@ class CheckReferenceValidityPass implements CompilerPassInterface
     {
         $this->container = $container;
 
-        $children = $this->container->getScopeChildren(false);
+        $children = $this->container->getScopeChildren();
         $ancestors = array();
 
-        $scopes = $this->container->getScopes(false);
+        $scopes = $this->container->getScopes();
         foreach ($scopes as $name => $parent) {
             $ancestors[$name] = array($parent);
 
@@ -64,7 +64,7 @@ class CheckReferenceValidityPass implements CompilerPassInterface
             }
 
             $this->currentId = $id;
-            $this->currentScope = $scope = $definition->getScope(false);
+            $this->currentScope = $scope = $definition->getScope();
 
             if (ContainerInterface::SCOPE_CONTAINER === $scope) {
                 $this->currentScopeChildren = array_keys($scopes);
@@ -124,7 +124,7 @@ class CheckReferenceValidityPass implements CompilerPassInterface
             return;
         }
 
-        if (!$reference->isStrict(false)) {
+        if (!$reference->isStrict()) {
             return;
         }
 
@@ -132,7 +132,7 @@ class CheckReferenceValidityPass implements CompilerPassInterface
             return;
         }
 
-        if ($this->currentScope === $scope = $definition->getScope(false)) {
+        if ($this->currentScope === $scope = $definition->getScope()) {
             return;
         }
 

@@ -12,14 +12,10 @@
 namespace Symfony\Component\Finder\Tests;
 
 use Symfony\Component\Finder\Adapter\GnuFindAdapter;
-use Symfony\Component\Finder\Finder;
 
-/**
- * @group legacy
- */
 class GnuFinderTest extends FinderTest
 {
-    protected function buildFinder()
+    protected function getAdapter()
     {
         $adapter = new GnuFindAdapter();
 
@@ -27,8 +23,6 @@ class GnuFinderTest extends FinderTest
             $this->markTestSkipped(get_class($adapter).' is not supported.');
         }
 
-        return Finder::create()
-            ->removeAdapters()
-            ->addAdapter($adapter);
+        return $adapter;
     }
 }

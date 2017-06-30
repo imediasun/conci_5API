@@ -90,7 +90,7 @@ class Stopwatch
      * @param string $name     The event name
      * @param string $category The event category
      *
-     * @return StopwatchEvent
+     * @return StopwatchEvent A StopwatchEvent instance
      */
     public function start($name, $category = null)
     {
@@ -114,7 +114,7 @@ class Stopwatch
      *
      * @param string $name The event name
      *
-     * @return StopwatchEvent
+     * @return StopwatchEvent A StopwatchEvent instance
      */
     public function stop($name)
     {
@@ -126,7 +126,7 @@ class Stopwatch
      *
      * @param string $name The event name
      *
-     * @return StopwatchEvent
+     * @return StopwatchEvent A StopwatchEvent instance
      */
     public function lap($name)
     {
@@ -138,7 +138,7 @@ class Stopwatch
      *
      * @param string $name The event name
      *
-     * @return StopwatchEvent
+     * @return StopwatchEvent A StopwatchEvent instance
      */
     public function getEvent($name)
     {
@@ -150,7 +150,7 @@ class Stopwatch
      *
      * @param string $id A section identifier
      *
-     * @return StopwatchEvent[]
+     * @return StopwatchEvent[] An array of StopwatchEvent instances
      */
     public function getSectionEvents($id)
     {

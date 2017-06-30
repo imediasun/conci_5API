@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Console\Question;
 
-use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Component\Console\Exception\LogicException;
-
 /**
  * Represents a Question.
  *
@@ -77,14 +74,14 @@ class Question
      *
      * @param bool $hidden
      *
-     * @return $this
+     * @return Question The current instance
      *
-     * @throws LogicException In case the autocompleter is also used
+     * @throws \LogicException In case the autocompleter is also used
      */
     public function setHidden($hidden)
     {
         if ($this->autocompleterValues) {
-            throw new LogicException('A hidden question cannot use the autocompleter.');
+            throw new \LogicException('A hidden question cannot use the autocompleter.');
         }
 
         $this->hidden = (bool) $hidden;
@@ -107,7 +104,7 @@ class Question
      *
      * @param bool $fallback
      *
-     * @return $this
+     * @return Question The current instance
      */
     public function setHiddenFallback($fallback)
     {
@@ -131,25 +128,25 @@ class Question
      *
      * @param null|array|\Traversable $values
      *
-     * @return $this
+     * @return Question The current instance
      *
-     * @throws InvalidArgumentException
-     * @throws LogicException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
      */
     public function setAutocompleterValues($values)
     {
-        if (is_array($values)) {
-            $values = $this->isAssoc($values) ? array_merge(array_keys($values), array_values($values)) : array_values($values);
+        if (is_array($values) && $this->isAssoc($values)) {
+            $values = array_merge(array_keys($values), array_values($values));
         }
 
         if (null !== $values && !is_array($values)) {
-            if (!$values instanceof \Traversable || !$values instanceof \Countable) {
-                throw new InvalidArgumentException('Autocompleter values can be either an array, `null` or an object implementing both `Countable` and `Traversable` interfaces.');
+            if (!$values instanceof \Traversable || $values instanceof \Countable) {
+                throw new \InvalidArgumentException('Autocompleter values can be either an array, `null` or an object implementing both `Countable` and `Traversable` interfaces.');
             }
         }
 
         if ($this->hidden) {
-            throw new LogicException('A hidden question cannot use the autocompleter.');
+            throw new \LogicException('A hidden question cannot use the autocompleter.');
         }
 
         $this->autocompleterValues = $values;
@@ -162,7 +159,7 @@ class Question
      *
      * @param null|callable $validator
      *
-     * @return $this
+     * @return Question The current instance
      */
     public function setValidator($validator)
     {
@@ -188,14 +185,14 @@ class Question
      *
      * @param null|int $attempts
      *
-     * @return $this
+     * @return Question The current instance
      *
-     * @throws InvalidArgumentException In case the number of attempts is invalid.
+     * @throws \InvalidArgumentException In case the number of attempts is invalid.
      */
     public function setMaxAttempts($attempts)
     {
         if (null !== $attempts && $attempts < 1) {
-            throw new InvalidArgumentException('Maximum number of attempts must be a positive value.');
+            throw new \InvalidArgumentException('Maximum number of attempts must be a positive value.');
         }
 
         $this->attempts = $attempts;
@@ -222,7 +219,7 @@ class Question
      *
      * @param callable $normalizer
      *
-     * @return $this
+     * @return Question The current instance
      */
     public function setNormalizer($normalizer)
     {

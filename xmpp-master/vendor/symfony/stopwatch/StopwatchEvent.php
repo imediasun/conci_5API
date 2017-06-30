@@ -75,7 +75,7 @@ class StopwatchEvent
     /**
      * Starts a new event period.
      *
-     * @return $this
+     * @return StopwatchEvent The event
      */
     public function start()
     {
@@ -87,7 +87,9 @@ class StopwatchEvent
     /**
      * Stops the last started event period.
      *
-     * @return $this
+     * @throws \LogicException When start wasn't called before stopping
+     *
+     * @return StopwatchEvent The event
      *
      * @throws \LogicException When stop() is called without a matching call to start()
      */
@@ -115,7 +117,7 @@ class StopwatchEvent
     /**
      * Stops the current period and then starts a new one.
      *
-     * @return $this
+     * @return StopwatchEvent The event
      */
     public function lap()
     {

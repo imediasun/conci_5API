@@ -11,20 +11,23 @@
 
 namespace Symfony\Component\Translation\Tests\Dumper;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Dumper\CsvFileDumper;
 
-class CsvFileDumperTest extends TestCase
+class CsvFileDumperTest extends \PHPUnit_Framework_TestCase
 {
-    public function testFormatCatalogue()
+    public function testDump()
     {
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(array('foo' => 'bar', 'bar' => 'foo
 foo', 'foo;foo' => 'bar'));
 
+        $tempDir = sys_get_temp_dir();
         $dumper = new CsvFileDumper();
+        $dumper->dump($catalogue, array('path' => $tempDir));
 
-        $this->assertStringEqualsFile(__DIR__.'/../fixtures/valid.csv', $dumper->formatCatalogue($catalogue, 'messages'));
+        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/valid.csv'), file_get_contents($tempDir.'/messages.en.csv'));
+
+        unlink($tempDir.'/messages.en.csv');
     }
 }

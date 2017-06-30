@@ -5,8 +5,6 @@
          backupGlobals="false"
          colors="true"
          bootstrap="vendor/autoload.php"
-         failOnRisky="true"
-         failOnWarning="true"
 >
     <php>
         <ini name="error_reporting" value="-1" />
@@ -22,8 +20,8 @@
         <whitelist>
             <directory>./</directory>
             <exclude>
-                <directory>./Tests</directory>
                 <directory>./vendor</directory>
+                <directory>./Tests</directory>
             </exclude>
         </whitelist>
     </filter>

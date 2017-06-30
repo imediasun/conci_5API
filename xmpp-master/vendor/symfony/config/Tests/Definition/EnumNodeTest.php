@@ -11,10 +11,9 @@
 
 namespace Symfony\Component\Config\Tests\Definition;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\EnumNode;
 
-class EnumNodeTest extends TestCase
+class EnumNodeTest extends \PHPUnit_Framework_TestCase
 {
     public function testFinalizeValue()
     {
@@ -24,23 +23,10 @@ class EnumNodeTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $values must contain at least one element.
      */
-    public function testConstructionWithNoValues()
-    {
-        new EnumNode('foo', null, array());
-    }
-
     public function testConstructionWithOneValue()
     {
-        $node = new EnumNode('foo', null, array('foo'));
-        $this->assertSame('foo', $node->finalize('foo'));
-    }
-
-    public function testConstructionWithOneDistinctValue()
-    {
-        $node = new EnumNode('foo', null, array('foo', 'foo'));
-        $this->assertSame('foo', $node->finalize('foo'));
+        new EnumNode('foo', null, array('foo', 'foo'));
     }
 
     /**

@@ -4,6 +4,7 @@ require_once __DIR__.'/../includes/classes.php';
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 $container = new ContainerBuilder();
 $container->
@@ -29,13 +30,8 @@ $container->
     setFactoryService('foo.baz')->
     setFactoryMethod('getInstance')
 ;
-$container
-    ->register('foo_bar', '%foo_class%')
-    ->setScope('prototype')
-;
 $container->getParameterBag()->clear();
 $container->getParameterBag()->add(array(
-    'foo_class' => 'Bar\FooClass',
     'baz_class' => 'BazClass',
     'foo' => 'bar',
 ));

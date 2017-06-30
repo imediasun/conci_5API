@@ -26,7 +26,7 @@ abstract class NumericNodeDefinition extends ScalarNodeDefinition
      *
      * @param mixed $max
      *
-     * @return $this
+     * @return NumericNodeDefinition
      *
      * @throws \InvalidArgumentException when the constraint is inconsistent
      */
@@ -45,7 +45,7 @@ abstract class NumericNodeDefinition extends ScalarNodeDefinition
      *
      * @param mixed $min
      *
-     * @return $this
+     * @return NumericNodeDefinition
      *
      * @throws \InvalidArgumentException when the constraint is inconsistent
      */
@@ -57,17 +57,5 @@ abstract class NumericNodeDefinition extends ScalarNodeDefinition
         $this->min = $min;
 
         return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated Deprecated since version 2.8, to be removed in 3.0.
-     */
-    public function cannotBeEmpty()
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        return parent::cannotBeEmpty();
     }
 }

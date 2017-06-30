@@ -17,24 +17,15 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "symfony/filesystem": "~2.3|~3.0.0"
-    },
-    "require-dev": {
-        "symfony/yaml": "~2.7|~3.0.0"
-    },
-    "suggest": {
-        "symfony/yaml": "To use the yaml reference dumper"
+        "symfony/filesystem": "~2.3"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Config\\": "" },
-        "exclude-from-classmap": [
-            "/Tests/"
-        ]
+        "psr-4": { "Symfony\\Component\\Config\\": "" }
     },
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.8-dev"
+            "dev-master": "2.7-dev"
         }
     }
 }

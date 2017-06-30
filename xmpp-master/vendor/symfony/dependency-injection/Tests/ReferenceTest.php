@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ReferenceTest extends TestCase
+class ReferenceTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @covers Symfony\Component\DependencyInjection\Reference::__construct
+     */
     public function testConstructor()
     {
         $ref = new Reference('foo');

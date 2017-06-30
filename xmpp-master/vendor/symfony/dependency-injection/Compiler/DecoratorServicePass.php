@@ -19,28 +19,18 @@ use Symfony\Component\DependencyInjection\Alias;
  *
  * @author Christophe Coevoet <stof@notk.org>
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Diego Saint Esteben <diego@saintesteben.me>
  */
 class DecoratorServicePass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        $definitions = new \SplPriorityQueue();
-        $order = PHP_INT_MAX;
-
         foreach ($container->getDefinitions() as $id => $definition) {
             if (!$decorated = $definition->getDecoratedService()) {
                 continue;
             }
-            $definitions->insert(array($id, $definition), array($decorated[2], --$order));
-        }
-
-        foreach ($definitions as $arr) {
-            list($id, $definition) = $arr;
-            list($inner, $renamedId) = $definition->getDecoratedService();
-
             $definition->setDecoratedService(null);
 
+            list($inner, $renamedId) = $decorated;
             if (!$renamedId) {
                 $renamedId = $id.'.inner';
             }
@@ -52,14 +42,10 @@ class DecoratorServicePass implements CompilerPassInterface
                 $public = $alias->isPublic();
                 $container->setAlias($renamedId, new Alias((string) $alias, false));
             } else {
-                $decoratedDefinition = $container->getDefinition($inner);
-                $definition->setTags(array_merge($decoratedDefinition->getTags(), $definition->getTags()));
-                $definition->setAutowiringTypes(array_merge($decoratedDefinition->getAutowiringTypes(), $definition->getAutowiringTypes()));
-                $public = $decoratedDefinition->isPublic();
-                $decoratedDefinition->setPublic(false);
-                $decoratedDefinition->setTags(array());
-                $decoratedDefinition->setAutowiringTypes(array());
-                $container->setDefinition($renamedId, $decoratedDefinition);
+                $definition = $container->getDefinition($inner);
+                $public = $definition->isPublic();
+                $definition->setPublic(false);
+                $container->setDefinition($renamedId, $definition);
             }
 
             $container->setAlias($inner, new Alias($id, $public));

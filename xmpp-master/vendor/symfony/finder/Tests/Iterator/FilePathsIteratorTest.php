@@ -13,9 +13,6 @@ namespace Symfony\Component\Finder\Tests\Iterator;
 
 use Symfony\Component\Finder\Iterator\FilePathsIterator;
 
-/**
- * @group legacy
- */
 class FilePathsIteratorTest extends RealIteratorTestCase
 {
     /**

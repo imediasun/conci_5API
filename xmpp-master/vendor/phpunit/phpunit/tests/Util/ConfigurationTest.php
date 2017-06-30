@@ -103,7 +103,6 @@ class Util_ConfigurationTest extends PHPUnit_Framework_TestCase
                 'file' =>
                 array(
                   0 => '/path/to/file',
-                  1 => '/path/to/file',
                 ),
               ),
               'exclude' =>

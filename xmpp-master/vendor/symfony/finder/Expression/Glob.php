@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Finder\Expression;
 
-@trigger_error('The '.__NAMESPACE__.'\Glob class is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-
 use Symfony\Component\Finder\Glob as FinderGlob;
 
 /**
