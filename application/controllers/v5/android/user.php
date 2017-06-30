@@ -1480,6 +1480,7 @@ class User extends MY_Controller {
                                 $availCategory[(string) $cat->_id] = $cat->name;
                                 $category_drivers = $this->app_model->get_nearest_driver($coordinates, (string) $cat->_id, $limit);
 								
+								
 								#$mins = $this->format_string('mins', 'mins');
 								$mins = $this->format_string('min', 'min_short');
 								$mins_short = $this->format_string('mins', 'mins_short');
@@ -1593,7 +1594,8 @@ class User extends MY_Controller {
                                 $lat = $driver['loc']['lat'];
                                 $lon = $driver['loc']['lon'];
                                 $driversArr[] = array('lat' => $lat,
-                                    'lon' => $lon,'image' => USER_PROFILE_IMAGE .$driver['image']
+                                    'lon' => $lon,'image' => USER_PROFILE_IMAGE .$driver['image'],
+									
                                 );
 								
                             }
@@ -2382,7 +2384,7 @@ class User extends MY_Controller {
 
             $acceptance = 'No';
             if ($ride_id != '') {
-                var_dump($ride_id);die;
+                
                 //How did the system knows the ride_id while the ride not confirmed by the driver
                 $checkRide = $this->app_model->get_selected_fields(RIDES, array('ride_id' => $ride_id), array('ride_id', 'ride_status', 'booking_information', 'driver', 'coupon_used', 'coupon', 'cancelled'));
 
@@ -2407,18 +2409,7 @@ class User extends MY_Controller {
                     }
                 }
 
-                //find the driver
-                $checkDriver = $this->app_model->get_selected_fields(DRIVERS, array('_id' => new \MongoId($checkRide->row()->driver['id'])), array('driver_location','category'));
-                $location=$checkDriver->row()->driver_location;
-                $gender=$checkDriver->row()->category;
 
-                //Find the card_rate from location
-                $checkLocation = $this->app_model->get_selected_fields(LOCATIONS, array('_id' => new \MongoId($location)), array('fare'));
-                foreach($checkLocation->row()->fare as $key=>$val){
-                    if($key==$gender){
-                        $locationReturn=$val['per_minute'];
-                    }
-                }
             }
 
             if ($acceptance == 'No') {
@@ -2439,7 +2430,9 @@ class User extends MY_Controller {
                         $userArr['pickup_lat'] = $pickup_lat; //проверить юзера ли это координаты
                         $userArr['pickup_lon'] =$pickup_lon;
                         $this->push_data['user']=$userArr;
-                        /*$this->push_data['price_per_minute']=$locationReturn;*/
+						
+						
+
 
                         //find user rating
                         $get_review_options = $this->review_model->get_all_details(REVIEW_OPTIONS,array('option_holder' => 'user'));
@@ -2601,6 +2594,27 @@ class User extends MY_Controller {
                                     if ($type == 0) {
                                         $message = $this->format_string("Request for pickup user","request_pickup_user");
                                         $response_time = 40;/*$this->config->item('respond_timeout')*/
+	
+								foreach ($category_drivers['result'][0]['_id'] as $val){
+									$checkDriver = $this->app_model->get_selected_fields(DRIVERS, array('_id' => new \MongoId($val)), array('driver_location','category'));
+											
+									
+								}										
+
+						 //find the driver
+						$location=$checkDriver->row()->driver_location;
+						$gender=$checkDriver->row()->category;  
+						//Find the card_rate from location
+						 $checkLocation = $this->app_model->get_selected_fields(LOCATIONS, array('_id' => new \MongoId($location)), array('fare'));
+						foreach($checkLocation->row()->fare as $key=>$val){
+							if($key==$gender){
+								$locationReturn=$val['per_minute'];
+							}
+						} 
+						
+						
+                        $this->push_data['price_per_minute']=$locationReturn;								
+										
 
                                         $options = array($ride_id, $response_time, $pickup, $drop_loc,$this->push_data);//it works ??
                                         if (!empty($android_driver)) {

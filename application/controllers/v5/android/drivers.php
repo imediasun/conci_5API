@@ -404,6 +404,7 @@ class Drivers extends MY_Controller {
      *
      * */
     public function accept_ride() {
+		
         $returnArr['status'] = '0';
         $returnArr['response'] = '';
 		$returnArr['ride_view'] = 'stay';
@@ -655,7 +656,9 @@ class Drivers extends MY_Controller {
 											'vehicle_model' => (string) $vehicle_model,
 											'pickup_location' => (string) $checkRide->row()->booking_information['pickup']['location'],
 											'pickup_lat' => (string) $pickup_lat,
-											'pickup_lon' => (string) $pickup_lon
+											'pickup_lon' => (string) $pickup_lon,
+											'medal'=>'1'
+											
 										);
 										/* Preparing driver information to share with user -- End */
 
@@ -686,10 +689,12 @@ class Drivers extends MY_Controller {
 
 										/* Sending notification to user regarding booking confirmation -- Start */
 										# Push notification
+										
 										if (isset($userVal->row()->push_type)) {
 											if ($userVal->row()->push_type != '') {
 												$message = $this->format_string('Your ride request confirmed', 'ride_request_confirmed');												
 												$options = $driver_profile;
+												$driver_profile=array();/////////////////////ATENTION//////////////////////
 												if ($userVal->row()->push_type == 'ANDROID') {
 													if (isset($userVal->row()->push_notification_key['gcm_id'])) {
 														if ($userVal->row()->push_notification_key['gcm_id'] != '') {

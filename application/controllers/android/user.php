@@ -1489,6 +1489,9 @@ class User extends MY_Controller {
                                 );
                             }
                         }
+						
+
+						
                         $returnArr['status'] = '1';
 
                         if (empty($categoryArr)) {

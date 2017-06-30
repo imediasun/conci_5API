@@ -14,6 +14,7 @@ class User extends MY_Controller {
 		$this->load->library(array('encrypt','form_validation'));
 		$this->load->model('user_action_model'); 
 		$this->load->model('app_model'); 
+		$this->load->model('review_model');
 		$responseArr=array();
 		
         
@@ -586,6 +587,7 @@ class User extends MY_Controller {
      *
      * */
     public function track_driver_location() {
+		var_dump(123);die;
 		
         $ride_id = $this->input->post('ride_id');
         if ($ride_id == '') {
@@ -659,6 +661,65 @@ class User extends MY_Controller {
 					
 					/* $type_of_service = $this->app_model->get_selected_fields(VEHICLES, array('_id' => new \MongoId($checkDriver->row()->type_of_service)), array('vehicle_type')); */
                     
+					foreach($checkDriver->row()->_id as $valu){
+						$getCond = array('driver.id' => $valu,'driver_review_status' => 'Yes');
+					}
+					
+                $get_ratings = $this->review_model->get_selected_fields(RIDES,$getCond,array('ratings.driver','history.end_ride','history.begin_ride'));
+				
+				foreach($get_ratings->result() as $key=>$rating){
+                    //calculate full hours
+                    $start_job=$rating->history['begin_ride']->sec;
+                    $end_job=$rating->history['end_ride']->sec;
+                    $begin_time= date('m/d/Y H:i:s', $start_job);
+                    $end_time= date('m/d/Y H:i:s', $end_job);
+				$ride_total_time_min[] = (strtotime ($end_time)-strtotime ($begin_time))/60;
+				$driver_rating[]=$rating->ratings['driver'];
+				}				
+				$num_reviews=$get_ratings->num_rows();
+             	
+					$one_star=0;
+					$two_star=0;
+					$tree_star=0;
+					$fore_star=0;
+					$five_star=0;
+					
+					foreach($driver_rating as $val){
+     				 switch (round($val['avg_rating'])){
+                        case (1): $one_star++;
+                        break;
+                        case (2): $two_star++;
+                        break;
+                        case (3): $tree_star++;
+                        break;
+                        case (4): $fore_star++;
+                        break;
+                        case (5): $five_star++;
+                        break;
+                    }
+				}
+
+                    $total_time_minutes=array_sum($ride_total_time_min);
+                    $full_hours=round($total_time_minutes/60);
+                    $points=$full_hours+$num_reviews;
+                    //calculate the medals
+                    switch ($points){
+                        case ($points<50): $medal=1;
+                        break;
+                        case ($points>=50 && $points <= 150 ): $medal=2;
+                        break;
+                        case ($points>150 && $points<250): $medal=3;
+                            break;
+                        case ($points>=250 && $points<500): $medal=4;
+                            break;
+                        case ($points>=500 ): $medal=5;
+                            break;
+
+                    }
+					
+					
+					
+					
 					if($checkDriver->row()->languages===null){
 					$languages="";	
 					}
@@ -667,7 +728,8 @@ class User extends MY_Controller {
 					}
 					
 					
-					$type_of_service = $type_of_service->row()->vehicle_type===null ? "silver" : $type_of_service->row()->vehicle_type; //????
+					
+					
 					$driver_profile = array('driver_id' => (string) $checkDriver->row()->_id,
                         'driver_name' => (string) $checkDriver->row()->driver_name,
                         'driver_email' => (string) $checkDriver->row()->email,
@@ -682,7 +744,7 @@ class User extends MY_Controller {
                         'phone_number' => (string) $checkDriver->row()->dail_code . $checkDriver->row()->mobile_number,
                         'vehicle_number' => (string) $checkDriver->row()->vehicle_number,
                         'vehicle_model' => (string) $vehicle_model,
-						'type-of-service' => $type_of_service,
+						'type-of-service_medal' => $medal,
                         'driver_languages'=> $languages,
                         'ride_status' => (string) $checkRide->row()->ride_status,
                         'pickup' => $pickup_arr,

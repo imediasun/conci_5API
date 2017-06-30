@@ -423,6 +423,7 @@ class Notification extends MY_Controller {
 
 
         foreach ($usersList->result_array() as $user) {
+			var_dump($user);
             if (array_key_exists('push_notification', $user)) {
 
                 if ($user['push_notification']['type'] == 'ANDROID') {
@@ -459,12 +460,13 @@ class Notification extends MY_Controller {
             /*echo "android_driver";
             echo "<br>";
             var_dump($android_driver);*/
-            $this->sendPushNotification($android_driver, $message, 'ads', 'ANDROID', $options, 'DRIVER');
+          $this->sendPushNotification($android_driver, $message, 'ads', 'ANDROID', $options, 'DRIVER');
         }
         else{
             /*var_dump('empty');die;*/
         }
         if (!empty($apple_driver)) {
+			
             $this->sendPushNotification($apple_driver, $message, 'ads', 'IOS', $options, 'DRIVER');
         }
 		//Here we stor the data of this push notification to database

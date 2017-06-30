@@ -619,6 +619,62 @@ class Drivers extends MY_Controller {
 										if (isset($checkDriver->row()->avg_review)) {
 											$driver_review = $checkDriver->row()->avg_review;
 										}
+				foreach($checkDriver->row()->_id as $valu){
+					$getCond = array('driver.id' => $valu,'driver_review_status' => 'Yes');
+				}
+					
+                $get_ratings = $this->review_model->get_selected_fields(RIDES,$getCond,array('ratings.driver','history.end_ride','history.begin_ride'));
+				
+				foreach($get_ratings->result() as $key=>$rating){
+                    //calculate full hours
+                    $start_job=$rating->history['begin_ride']->sec;
+                    $end_job=$rating->history['end_ride']->sec;
+                    $begin_time= date('m/d/Y H:i:s', $start_job);
+                    $end_time= date('m/d/Y H:i:s', $end_job);
+				$ride_total_time_min[] = (strtotime ($end_time)-strtotime ($begin_time))/60;
+				$driver_rating[]=$rating->ratings['driver'];
+				}				
+				$num_reviews=$get_ratings->num_rows();
+             	
+					$one_star=0;
+					$two_star=0;
+					$tree_star=0;
+					$fore_star=0;
+					$five_star=0;
+					
+					foreach($driver_rating as $val){
+     				 switch (round($val['avg_rating'])){
+                        case (1): $one_star++;
+                        break;
+                        case (2): $two_star++;
+                        break;
+                        case (3): $tree_star++;
+                        break;
+                        case (4): $fore_star++;
+                        break;
+                        case (5): $five_star++;
+                        break;
+                    }
+				}
+
+                    $total_time_minutes=array_sum($ride_total_time_min);
+                    $full_hours=round($total_time_minutes/60);
+                    $points=$full_hours+$num_reviews;
+                    //calculate the medals
+                    switch ($points){
+                        case ($points<50): $medal=1;
+                        break;
+                        case ($points>=50 && $points <= 150 ): $medal=2;
+                        break;
+                        case ($points>150 && $points<250): $medal=3;
+                            break;
+                        case ($points>=250 && $points<500): $medal=4;
+                            break;
+                        case ($points>=500 ): $medal=5;
+                            break;
+
+                    }
+										
 										$driver_profile = array('driver_id' => (string) $checkDriver->row()->_id,
 											'driver_name' => (string) $checkDriver->row()->driver_name,
 											'driver_email' => (string) $checkDriver->row()->email,
@@ -633,7 +689,8 @@ class Drivers extends MY_Controller {
 											'vehicle_model' => (string) $vehicle_model,
 											'pickup_location' => (string) $checkRide->row()->booking_information['pickup']['location'],
 											'pickup_lat' => (string) $pickup_lat,
-											'pickup_lon' => (string) $pickup_lon
+											'pickup_lon' => (string) $pickup_lon,
+											'medal'=>$medal
 										);
 										/* Preparing driver information to share with user -- End */
 
@@ -666,7 +723,7 @@ class Drivers extends MY_Controller {
 										# Push notification
 										if (isset($userVal->row()->push_type)) {
 											if ($userVal->row()->push_type != '') {
-												$message = 'Your ride request confirmed';
+												$message = 'Your ride request confirmed2';//ATENTION!!!!!!///////////////////////////////////////////
 												$options = $driver_profile;
 												if ($userVal->row()->push_type == 'ANDROID') {
 													if (isset($userVal->row()->push_notification_key['gcm_id'])) {

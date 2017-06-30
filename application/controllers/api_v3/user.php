@@ -579,7 +579,7 @@ class User extends MY_Controller {
      * User track the river location after booking confirmed
      *
      * */
-    public function track_driver_location() {
+/*     public function track_driver_location() {
         $ride_id = $this->input->post('ride_id');
         if ($ride_id == '') {
             $ride_id = $this->input->get('ride_id');
@@ -594,7 +594,7 @@ class User extends MY_Controller {
                     $driver_lat = $lat_lon[0];
                     $driver_lon = $lat_lon[1];
 
-                    /*                     * *********   find estimated duration   ********** */
+                    
                     $pickupLocArr = $checkRide->row()->booking_information['pickup']['latlong'];
 
                     $from = $driver_lat . ',' . $driver_lon;
@@ -612,7 +612,7 @@ class User extends MY_Controller {
 
 
                     $checkDriver = $this->app_model->get_selected_fields(DRIVERS, array('_id' => new \MongoId($driver_id)), array('_id', 'driver_name', 'image', 'avg_review', 'email', 'dail_code', 'mobile_number', 'vehicle_number', 'vehicle_model'));
-                    /* Preparing driver information to share with user -- Start */
+                   
                     $driver_image = USER_PROFILE_IMAGE_DEFAULT;
                     if (isset($checkDriver->row()->image)) {
                         if ($checkDriver->row()->image != '') {
@@ -661,6 +661,205 @@ class User extends MY_Controller {
                         'phone_number' => (string) $checkDriver->row()->dail_code . $checkDriver->row()->mobile_number,
                         'vehicle_number' => (string) $checkDriver->row()->vehicle_number,
                         'vehicle_model' => (string) $vehicle_model,
+                        'ride_status' => (string) $checkRide->row()->ride_status,
+                        'pickup' => $pickup_arr,
+                        'drop' => $drop_arr
+                    );
+                   
+                } else {
+                    $driver_profile = array();
+                }
+
+                
+                $tracking_records = $this->app_model->get_all_details(TRACKING, array('ride_id' => $ride_id));
+
+                $tracking = array();
+                if ($tracking_records->num_rows() != 0) {
+                    $allStages = $tracking_records->row()->steps;
+                    for ($i = 0; $i < count($allStages); $i++) {
+                        $lastTime = date('M d, Y h:i A', $allStages[$i]['timestamp']->sec);
+                        $tracking[] = array('on_time' => $lastTime,
+                            'location' => $allStages[$i]['location']
+                        );
+                    }
+                }
+                if (empty($driver_profile)) {
+                    $driver_profile = json_decode("{}");
+                }
+                if (empty($tracking)) {
+                    $tracking = json_decode("{}");
+                }
+                $returnArr['status'] = '1';
+                $returnArr['response'] = array('ride_id' => (string) $ride_id, 'driver_profile' => $driver_profile, 'tracking_details' => $tracking);
+            } else {
+                $returnArr['response'] = $this->format_string('Records not available', 'no_records_found');
+            }
+        } else {
+            $returnArr['response'] = $this->format_string('Some Parameters are missing', 'some_parameters_missing');
+        }
+        $json_encode = json_encode($returnArr, JSON_PRETTY_PRINT);
+        echo $this->cleanString($json_encode);
+    } */
+	
+	   public function track_driver_location() {
+		
+        $ride_id = $this->input->post('ride_id');
+        if ($ride_id == '') {
+            $ride_id = $this->input->get('ride_id');
+        }
+        $returnArr['status'] = '0';
+        if ($ride_id != '') {
+            $checkRide = $this->app_model->get_selected_fields(RIDES, array('ride_id' => $ride_id), array('ride_id', 'ride_status', 'booking_information', 'driver', 'coupon_used', 'coupon', 'cancelled'));
+            if ($checkRide->num_rows() == 1) {
+                $driver_id = $checkRide->row()->driver['id'];
+                if ($driver_id != '') {
+                    $lat_lon = @explode(',', $checkRide->row()->driver['lat_lon']);
+                    $driver_lat = $lat_lon[0];
+                    $driver_lon = $lat_lon[1];
+
+                    /*                     * *********   find estimated duration   ********** */
+                    $pickupLocArr = $checkRide->row()->booking_information['pickup']['latlong'];
+
+                    $from = $driver_lat . ',' . $driver_lon;
+                    $to = $pickupLocArr['lat'] . ',' . $pickupLocArr['lon'];
+					
+					$mindurationtext = 'N/A';
+
+                    $gmap = file_get_contents('https://maps.googleapis.com/maps/api/directions/json?origin=' . $from . '&destination=' . $to . '&alternatives=true&sensor=false&mode=driving'.$this->data['google_maps_api_key']);
+                    $map_values = json_decode($gmap);
+                    $routes = $map_values->routes;
+					if(!empty($routes)){
+						usort($routes, create_function('$a,$b', 'return intval($a->legs[0]->distance->value) - intval($b->legs[0]->distance->value);'));
+						$mindurationtext = $routes[0]->legs[0]->duration->text;
+					}
+
+
+                    $checkDriver = $this->app_model->get_selected_fields(DRIVERS, array('_id' => new \MongoId($driver_id)), array('_id', 'driver_name', 'image', 'avg_review', 'email', 'dail_code', 'mobile_number', 'vehicle_number', 'vehicle_model','languages','type_of_service'));
+                    
+					
+					/* Preparing driver information to share with user -- Start */
+                    $driver_image = USER_PROFILE_IMAGE_DEFAULT;
+                    if (isset($checkDriver->row()->image)) {
+                        if ($checkDriver->row()->image != '') {
+                            $driver_image = USER_PROFILE_IMAGE . $checkDriver->row()->image;
+                        }
+                    }
+                    $driver_review = 0;
+                    if (isset($checkDriver->row()->avg_review)) {
+                        $driver_review = $checkDriver->row()->avg_review;
+                    }
+                    $vehicleInfo = $this->app_model->get_selected_fields(MODELS, array('_id' => new \MongoId($checkDriver->row()->vehicle_model)), array('_id', 'name', 'brand_name'));
+                    $vehicle_model = '';
+                    if ($vehicleInfo->num_rows() > 0) {
+                        $vehicle_model = $vehicleInfo->row()->name;
+                    }
+					
+					
+					$pickup_arr = array();
+					if($checkRide->row()->booking_information['pickup']['location']!=''){
+						$pickup_arr = $checkRide->row()->booking_information['pickup'];
+					}
+					if (empty($pickup_arr)) {
+						$pickup_arr = json_decode("{}");
+					}
+					
+					$drop_arr = array();
+					if($checkRide->row()->booking_information['drop']['location']!=''){
+						$drop_arr = $checkRide->row()->booking_information['drop'];
+					}
+					if (empty($drop_arr)) {
+						$drop_arr = json_decode("{}");
+					}
+
+					//get type of service
+					
+					/* $type_of_service = $this->app_model->get_selected_fields(VEHICLES, array('_id' => new \MongoId($checkDriver->row()->type_of_service)), array('vehicle_type')); */
+                    
+					foreach($checkDriver->row()->_id as $valu){
+						$getCond = array('driver.id' => $valu,'driver_review_status' => 'Yes');
+					}
+					
+                $get_ratings = $this->review_model->get_selected_fields(RIDES,$getCond,array('ratings.driver','history.end_ride','history.begin_ride'));
+				
+				foreach($get_ratings->result() as $key=>$rating){
+                    //calculate full hours
+                    $start_job=$rating->history['begin_ride']->sec;
+                    $end_job=$rating->history['end_ride']->sec;
+                    $begin_time= date('m/d/Y H:i:s', $start_job);
+                    $end_time= date('m/d/Y H:i:s', $end_job);
+				$ride_total_time_min[] = (strtotime ($end_time)-strtotime ($begin_time))/60;
+				$driver_rating[]=$rating->ratings['driver'];
+				}				
+				$num_reviews=$get_ratings->num_rows();
+             	
+					$one_star=0;
+					$two_star=0;
+					$tree_star=0;
+					$fore_star=0;
+					$five_star=0;
+					
+					foreach($driver_rating as $val){
+     				 switch (round($val['avg_rating'])){
+                        case (1): $one_star++;
+                        break;
+                        case (2): $two_star++;
+                        break;
+                        case (3): $tree_star++;
+                        break;
+                        case (4): $fore_star++;
+                        break;
+                        case (5): $five_star++;
+                        break;
+                    }
+				}
+
+                    $total_time_minutes=array_sum($ride_total_time_min);
+                    $full_hours=round($total_time_minutes/60);
+                    $points=$full_hours+$num_reviews;
+                    //calculate the medals
+                    switch ($points){
+                        case ($points<50): $medal=1;
+                        break;
+                        case ($points>=50 && $points <= 150 ): $medal=2;
+                        break;
+                        case ($points>150 && $points<250): $medal=3;
+                            break;
+                        case ($points>=250 && $points<500): $medal=4;
+                            break;
+                        case ($points>=500 ): $medal=5;
+                            break;
+
+                    }
+					
+					
+					
+					
+					if($checkDriver->row()->languages===null){
+					$languages="";	
+					}
+					else{
+					$languages=$checkDriver->row()->languages;	
+					}
+					
+					
+					
+					
+					$driver_profile = array('driver_id' => (string) $checkDriver->row()->_id,
+                        'driver_name' => (string) $checkDriver->row()->driver_name,
+                        'driver_email' => (string) $checkDriver->row()->email,
+                        'driver_image' => (string) base_url() . $driver_image,
+                        'driver_review' => (string) floatval($driver_review),
+                        'driver_lat' => (string) floatval($driver_lat),
+                        'driver_lon' => (string) floatval($driver_lon),
+                        'rider_lat' => (string) floatval($checkRide->row()->booking_information['pickup']['latlong']['lat']),
+                        'rider_lon' => (string) floatval($checkRide->row()->booking_information['pickup']['latlong']['lon']),
+                        'min_pickup_duration' => $mindurationtext,
+                        'ride_id' => (string) $ride_id,
+                        'phone_number' => (string) $checkDriver->row()->dail_code . $checkDriver->row()->mobile_number,
+                        'vehicle_number' => (string) $checkDriver->row()->vehicle_number,
+                        'vehicle_model' => (string) $vehicle_model,
+						'type-of-service_medal' => $medal,
+                        'driver_languages'=> $languages,
                         'ride_status' => (string) $checkRide->row()->ride_status,
                         'pickup' => $pickup_arr,
                         'drop' => $drop_arr
